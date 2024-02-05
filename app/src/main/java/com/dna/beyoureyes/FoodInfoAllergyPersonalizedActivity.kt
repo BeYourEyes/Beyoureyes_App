@@ -65,6 +65,10 @@ class FoodInfoAllergyPersonalizedActivity : AppCompatActivity() {
 
         // 모든 정보 표시 버튼
         binding.buttonGeneralize.setOnClickListener {
+            if (ttsManager.isSpeaking()) {
+                ttsManager.stop()
+                speakButton.text = "설명 듣기"
+            }
             finish()
             overridePendingTransition(R.anim.none, R.anim.none)
         }
@@ -81,13 +85,31 @@ class FoodInfoAllergyPersonalizedActivity : AppCompatActivity() {
                         if (commonAllergens.isNotEmpty()) {
                             val allergyMsg =
                                 "당신의 맞춤별 영양 정보를 분석해드리겠습니다. 해당 식품에는 당신이 유의해야 할 ${commonAllergens.joinToString()}이 함유되어 있습니다. 영양 성분 정보는 인식되지 않았습니다. 추가적인 정보를 원하시면 화면에 다시찍기 버튼을 눌러주세요"
-
-                            ttsManager.speak(allergyMsg)
+                            if (ttsManager.isSpeaking()) {
+                                ttsManager.stop()
+                                speakButton.text = "음성 듣기"
+                            } else {
+                                ttsManager.speak(allergyMsg)
+                                speakButton.text = "재생 중"
+                                ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
+                            }
+                            //ttsManager.speak(allergyMsg)
                         } else {
-                            ttsManager.speak(
-                                "당신의 맞춤별 영양 정보를 분석해드리겠습니다. 해당 식품에는 당신의 알러지 성분이 함유되어 있지 않습니다." +
-                                        " 영양 성분 정보는 인식되지 않았습니다. 추가적인 정보를 원하시면 화면에 다시찍기 버튼을 눌러주세요."
-                            )
+                            if (ttsManager.isSpeaking()) {
+                                ttsManager.stop()
+                                speakButton.text = "음성 듣기"
+                            } else {
+                                ttsManager.speak(
+                                    "당신의 맞춤별 영양 정보를 분석해드리겠습니다. 해당 식품에는 당신의 알러지 성분이 함유되어 있지 않습니다." +
+                                            " 영양 성분 정보는 인식되지 않았습니다. 추가적인 정보를 원하시면 화면에 다시찍기 버튼을 눌러주세요."
+                                )
+                                speakButton.text = "재생 중"
+                                ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
+                            }
+//                            ttsManager.speak(
+//                                "당신의 맞춤별 영양 정보를 분석해드리겠습니다. 해당 식품에는 당신의 알러지 성분이 함유되어 있지 않습니다." +
+//                                        " 영양 성분 정보는 인식되지 않았습니다. 추가적인 정보를 원하시면 화면에 다시찍기 버튼을 눌러주세요."
+//                            )
                         }
                     }
                 }
@@ -96,6 +118,9 @@ class FoodInfoAllergyPersonalizedActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+        }
         ttsManager.shutdown()
         super.onDestroy()
     }
@@ -109,5 +134,14 @@ class FoodInfoAllergyPersonalizedActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onBackPressed() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+            speakButton.text = "설명 듣기"
+        }
+        val intent = Intent(this, HomeActivity::class.java)
+        startActivity(intent)
     }
 }

@@ -49,25 +49,6 @@ class TodayIntakePersonalizedActivity : AppCompatActivity() {
         // 버튼 초기화
         speakButton = binding.buttonVoice
 
-        fun convertColorIntToRgb(colorInt: Int): Triple<Int, Int, Int> {
-            val red = colorInt shr 16 and 0xFF
-            val green = colorInt shr 8 and 0xFF
-            val blue = colorInt and 0xFF
-            return Triple(red, green, blue)
-        }
-
-        fun evaluateIntakeStatus(rgb: Triple<Int, Int, Int>): String {
-            val (red, green, blue) = rgb
-
-            return when {
-                red > 200 && green > 150 && blue < 50 -> "적정량 부족" // (241, 188, 0)
-                red > 50 && green > 200 && blue < 50 -> "적정량 안정" // (52, 202, 0)
-                red > 200 && green < 50 && blue < 50 -> "적정량 초과" // (255, 0, 0)
-                else -> "알 수 없음"
-            }
-        }
-
-
         // Firebase 연결을 위한 설정값
         val db = Firebase.firestore
 
@@ -164,7 +145,15 @@ class TodayIntakePersonalizedActivity : AppCompatActivity() {
                     ttsManager = TTSManager(this) {
                         speakButton.setOnClickListener {
                             val textToSpeech = "오늘의 섭취량 기록이 없습니다. 분석 결과를 제공받기 위해서 기록을 남겨보세요."
-                            ttsManager.speak(textToSpeech)
+                            if (ttsManager.isSpeaking()) {
+                                ttsManager.stop()
+                                speakButton.text = "설명 듣기"
+                            } else {
+                                ttsManager.speak(textToSpeech)
+                                speakButton.text = "재생 중"
+                                ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
+                            }
+                            //ttsManager.speak(textToSpeech)
                         }
                     }
 
@@ -214,32 +203,38 @@ class TodayIntakePersonalizedActivity : AppCompatActivity() {
                     // 2.4. 총 섭취량 화면 표시 - 성분별 섭취량 바
                     intakeBars.setAll(this, totalIntake, userDVs)
 
-                    // 초과, 적정, 부족 상태 판단
-                    val naStatus = evaluateIntakeStatus(convertColorIntToRgb(nat.getBarColor() ?: 0))
-                    val carboStatus = evaluateIntakeStatus(convertColorIntToRgb(carbo.getBarColor() ?: 0))
-                    val sugarStatus = evaluateIntakeStatus(convertColorIntToRgb(sugar.getBarColor() ?: 0))
-                    val proteinStatus = evaluateIntakeStatus(convertColorIntToRgb(protein.getBarColor() ?: 0))
-                    val fatStatus = evaluateIntakeStatus(convertColorIntToRgb(fat.getBarColor() ?: 0))
-                    val satfatStatus = evaluateIntakeStatus(convertColorIntToRgb(satfat.getBarColor() ?: 0))
-                    val choleStatus = evaluateIntakeStatus(convertColorIntToRgb(chole.getBarColor() ?: 0))
-
+                    // TTS 호출 여부 판단
                     // TTS 호출 여부 판단
                     fun getReviewText(): String {
-                        return if (!lackIntakeReviewTextView.text.startsWith("ㅇㅇ")) {
-                            lackIntakeReviewTextView.text.toString()
-                        } else {
-                            overIntakeReviewTextView.text.toString()
+                        val lackIntakeText = lackIntakeReviewTextView.text.toString()
+                        val overIntakeText = overIntakeReviewTextView.text.toString()
+
+                        return when {
+                            !lackIntakeText.startsWith("ㅇㅇ") && !overIntakeText.startsWith("ㅇㅇ") ->
+                                lackIntakeText + overIntakeText
+                            !lackIntakeText.startsWith("ㅇㅇ") -> lackIntakeText
+                            !overIntakeText.startsWith("ㅇㅇ") -> overIntakeText
+                            else -> overIntakeText + lackIntakeText
                         }
                     }
 
                     val reviewText = getReviewText()
+
 
                     // TTSManager 초기화 완료되었을때
                     ttsManager = TTSManager(this) {
                         speakButton.setOnClickListener {
                             val textToSpeech =
                                 "${dateText.text}의 섭취량 기록을 분석해드리겠습니다.${totalCalorieTextView.text} 또한 오늘은" + reviewText
-                            ttsManager.speak(textToSpeech)
+                            if (ttsManager.isSpeaking()) {
+                                ttsManager.stop()
+                                speakButton.text = "설명 듣기"
+                            } else {
+                                ttsManager.speak(textToSpeech)
+                                speakButton.text = "재생 중"
+                                ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
+                            }
+                            //ttsManager.speak(textToSpeech)
                         }
                     }
 
@@ -261,9 +256,21 @@ class TodayIntakePersonalizedActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+        }
         ttsManager.shutdown()
         super.onDestroy()
 
+    }
+
+    override fun onBackPressed() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+            speakButton.text = "설명 듣기"
+        }
+        val intent = Intent(this, HomeActivity::class.java)
+        startActivity(intent)
     }
 
 }

@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.dna.beyoureyes.databinding.ActivityFoodInfoAllBinding
@@ -151,7 +152,16 @@ class FoodInfoAllActivity : AppCompatActivity() {
                 val textToSpeak =
                     "영양 정보를 분석해드리겠습니다. $allergyText $calorieText 또한 영양 성분 정보는 1일 영양성분 기준치 당 $nutrientsText 입니다." +
                             " 해당 식품 섭취 시 먹기 버튼을 클릭하고 먹은 양의 정보를 알려주세요."
-                ttsManager.speak(textToSpeak)
+
+                if (ttsManager.isSpeaking()) {
+                    ttsManager.stop()
+                    speakButton.text = "음성 듣기"
+                } else {
+                    ttsManager.speak(textToSpeak)
+                    speakButton.text = "재생 중"
+                    ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
+                }
+            //    ttsManager.speak(textToSpeak)
             }
         }
 
@@ -160,7 +170,13 @@ class FoodInfoAllActivity : AppCompatActivity() {
 
         // 각각의 line_percent TextView에 Percent 리스트의 값 적용
         for (i in 0 until percentSize) {
-            val percentTextView = findViewById<TextView>(resources.getIdentifier("line${i + 1}_percent", "id", packageName))
+            val percentTextView = findViewById<TextView>(
+                resources.getIdentifier(
+                    "line${i + 1}_percent",
+                    "id",
+                    packageName
+                )
+            )
             val percentValue = Percent?.get(i) ?: "N/A"
             percentTextView.text = "$percentValue%"
         }
@@ -168,30 +184,38 @@ class FoodInfoAllActivity : AppCompatActivity() {
         val nutriSize = nutri?.size ?: 0
 
         for (i in 0 until nutriSize) {
-            val nutriTextView = findViewById<TextView>(resources.getIdentifier("line${i + 1}_label", "id", packageName))
+            val nutriTextView = findViewById<TextView>(
+                resources.getIdentifier(
+                    "line${i + 1}_label",
+                    "id",
+                    packageName
+                )
+            )
             val nutriValue = nutri?.get(i) ?: "N/A"
             nutriTextView.text = "$nutriValue"
         }
 
         //eatButton
-        eatButton.setOnClickListener{
-            val dialogView = LayoutInflater.from(this).inflate(R.layout.activity_alert_dialog_intake, null)
+        eatButton.setOnClickListener {
+            val dialogView =
+                LayoutInflater.from(this).inflate(R.layout.activity_alert_dialog_intake, null)
 
             val builder = AlertDialog.Builder(this@FoodInfoAllActivity)
-            var ratio : Double = 0.0
+            var ratio: Double = 0.0
             builder.setView(dialogView)
             val alertDialog = builder.create()
             alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-            val buttonAll : Button = dialogView.findViewById(R.id.buttonAll)
-            val buttonLot : Button = dialogView.findViewById(R.id.buttonLot)
-            val buttonHalf : Button = dialogView.findViewById(R.id.buttonHalf)
-            val buttonLittle : Button = dialogView.findViewById(R.id.buttonLittle)
+            val buttonAll: Button = dialogView.findViewById(R.id.buttonAll)
+            val buttonLot: Button = dialogView.findViewById(R.id.buttonLot)
+            val buttonHalf: Button = dialogView.findViewById(R.id.buttonHalf)
+            val buttonLittle: Button = dialogView.findViewById(R.id.buttonLittle)
 
-            val buttonBack : Button = dialogView.findViewById(R.id.buttonBack)
-            val buttonSend : Button = dialogView.findViewById(R.id.buttonSend)
+            val buttonBack: Button = dialogView.findViewById(R.id.buttonBack)
+            val buttonSend: Button = dialogView.findViewById(R.id.buttonSend)
 
-            val horizontalChartIntake : BarChart = dialogView.findViewById(R.id.horizontalChartIntake)
+            val horizontalChartIntake: BarChart =
+                dialogView.findViewById(R.id.horizontalChartIntake)
 
             Log.d("nutriList", moPercentList.toString())
             Log.d("nutriList", koreanCharacterList.toString())
@@ -267,20 +291,31 @@ class FoodInfoAllActivity : AppCompatActivity() {
             }
 
             buttonSend.setOnClickListener {
-                if (moPercentList != null) {
+                if (nutriFacts != null) {
+                    val koreanCharacterList = listOf("나트륨", "탄수화물", "당류", "지방", "포화지방", "콜레스테롤", "단백질")
                     val nutriData: HashMap<String, Serializable> = hashMapOf(
                         "userID" to AppUser.id!!,
                         "date" to SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date()),
-                        "calories" to modifiedKcalList!!.joinToString(", ").toInt() * ratio
                     )
-                    for (i in koreanCharacterList.indices) {
-                        nutriData[koreanCharacterList[i]] = moPercentList[i].toInt() * ratio
+
+                    nutriFacts.energy?.let {
+                        nutriData["calories"] = it * ratio
                     }
 
+                    for (i in koreanCharacterList.indices) {
+                        val milli = nutriFacts.getMilligramByNutriLabel(koreanCharacterList[i])
+                        if (milli != -1) {
+                            nutriData[koreanCharacterList[i]] = milli  * ratio
+                        }
+                    }
 
                     //Toast.makeText(this@FoodInfoAllActivity, sendData.toString(), Toast.LENGTH_LONG).show()
                     sendData(nutriData, "userIntakeNutrition")
                     alertDialog.dismiss()
+                    Toast.makeText(this@FoodInfoAllActivity, "먹은 양이 저장되었어요.", Toast.LENGTH_LONG)
+                        .show()
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
                 }
             }
 
@@ -294,16 +329,22 @@ class FoodInfoAllActivity : AppCompatActivity() {
         // 기존 Firebase와의 통신 코드는 다 제거
         AppUser.info?.let { // 사용자 정보 있을 시
 
-            val intent = Intent(this, FoodInfoAllPersonalizedActivity::class.java) //OCR 실패시 OCR 가이드라인으로 이동
+            val intent =
+                Intent(this, FoodInfoAllPersonalizedActivity::class.java) //OCR 실패시 OCR 가이드라인으로 이동
             // 식품 정보 전달
             intent.putExtra("totalKcal", modifiedKcalList?.get(0)?.toInt())
             intent.putExtra("nutriFactsInMilliString",
-                ArrayList(moPercentList?.map {it.toInt()}))
+                ArrayList(moPercentList?.map { it.toInt() })
+            )
             intent.putExtra("allergyList", allergyList)
             // 이제 intent로 사용자 정보 전달할 필요 X
 
             // 맞춤 정보 버튼 활성화
             personalButton.setOnClickListener {
+                if (ttsManager.isSpeaking()) {
+                    ttsManager.stop()
+                    speakButton.text = "설명 듣기"
+                }
                 startActivity(intent)
                 overridePendingTransition(R.anim.none, R.anim.none)
             }
@@ -316,13 +357,22 @@ class FoodInfoAllActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+            speakButton.text = "설명 듣기"
+        }
         val intent = Intent(this, HomeActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
         finish()
     }
 
-    private fun applyBarChart(barChart: BarChart, entries: List<BarEntry>, color: String, maximum: Float) {
+    private fun applyBarChart(
+        barChart: BarChart,
+        entries: List<BarEntry>,
+        color: String,
+        maximum: Float
+    ) {
         // 바 차트의 데이터셋 생성
         val dataSet = BarDataSet(entries, "My Data")
         dataSet.color = Color.parseColor(color)
@@ -379,7 +429,7 @@ class FoodInfoAllActivity : AppCompatActivity() {
         barChart.invalidate()
     } // applyBarChart
 
-    private fun sendData(foodInfo: HashMap<String, Serializable>, collectionName: String){
+    private fun sendData(foodInfo: HashMap<String, Serializable>, collectionName: String) {
         val db = Firebase.firestore
         db.collection(collectionName)
             .add(foodInfo)
@@ -393,8 +443,10 @@ class FoodInfoAllActivity : AppCompatActivity() {
 
 
     override fun onDestroy() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+        }
         ttsManager.shutdown()
         super.onDestroy()
     }
-
 }

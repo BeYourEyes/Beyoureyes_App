@@ -16,6 +16,7 @@ class CameraFirstActivity : AppCompatActivity()  {
         super.onCreate(savedInstanceState)
         binding = ActivityCameraFirstBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        overridePendingTransition(R.anim.horizon_enter, R.anim.horizon_exit)
 
         // 툴바
         setSupportActionBar(binding.include.toolbarDefault)
@@ -30,9 +31,7 @@ class CameraFirstActivity : AppCompatActivity()  {
 
         // 카메라
         binding.buttoncamera.setOnClickListener {
-            while(camera.start(this) == -1){
-                camera.start(this)
-            }
+            camera.start(this)
         }
 
         //openCV
