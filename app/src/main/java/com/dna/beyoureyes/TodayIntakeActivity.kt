@@ -222,5 +222,4 @@ class TodayIntakeActivity : AppCompatActivity() {
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
     }
-
 }
