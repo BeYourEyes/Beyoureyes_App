@@ -1,12 +1,22 @@
 package com.dna.beyoureyes
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
+import com.dna.beyoureyes.databinding.ActivityAlertDialogDefaultBinding
 import com.dna.beyoureyes.databinding.ActivityUserInfoBinding
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
@@ -16,11 +26,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.io.Serializable
 
 val diseaseKoreanList : List<String> = listOf("고혈압", "고지혈증", "당뇨")
 val allergyKoreanList : List<String> = listOf("메밀", "밀", "콩", "호두", "땅콩", "복숭아", "토마토", "돼지고기", "난류", "우유", "닭고기", "쇠고기", "새우", "고등어", "홍합", "전복", "굴", "조개류", "게", "오징어", "아황산")
@@ -47,7 +60,6 @@ class UserInfoActivity : AppCompatActivity() {
         binding = ActivityUserInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         overridePendingTransition(R.anim.horizon_enter, R.anim.horizon_exit)    // 화면 전환 시 애니메이션
         Log.d(TAG, AppUser.id.toString()+"   AGAIN")
         auth = Firebase.auth
@@ -67,7 +79,7 @@ class UserInfoActivity : AppCompatActivity() {
 
         val userInfoChangeButton = binding.userInfoChangeButton
         val googleConnectButton = binding.googleConnectButton
-        
+
         // 툴바
         setSupportActionBar(binding.include.toolbarDefault)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -80,6 +92,7 @@ class UserInfoActivity : AppCompatActivity() {
 
         // 사용자 정보 화면 표시 ---------------------------------------------
         AppUser.info?.let {
+            Log.d("USERINFO : ", "${AppUser.id}")
             // 나이 정보 표시
             infoAge.text = it.age.toString() + "세"
             // 성별 정보 표시
@@ -93,6 +106,22 @@ class UserInfoActivity : AppCompatActivity() {
                 for (diseaseItem in diseaseArray) {
                     val chip = Chip(this)
                     chip.text = diseaseItem
+                    // Chip 뷰의 크기 및 여백 설정
+                    // 원하는 폰트 파일을 res/font 디렉토리에 추가한 후 R.font.custom_font로 참조
+                    val customTypeface = ResourcesCompat.getFont(this, R.font.pretendard600)
+
+                    // 폰트 설정
+                    chip.typeface = customTypeface
+                    val params = ChipGroup.LayoutParams(
+                        250, // 넓이 80
+                        150  // 높이 50
+                    )
+                    params.setMargins(8, 8, 8, 8) // 여백을 8로
+                    chip.layoutParams = params
+                    // 글씨 크기
+                    chip.textSize = 24f
+                    // 가운데 정렬
+                    chip.textAlignment = View.TEXT_ALIGNMENT_CENTER
                     chip.setChipBackgroundColorResource(R.color.red)
                     chip.setTextColor(Color.WHITE)
                     diseaseChipGroup.addView(chip)
@@ -104,6 +133,22 @@ class UserInfoActivity : AppCompatActivity() {
                 for (allergyItem in allergyArray ) {
                     val chip = Chip(this)
                     chip.text = allergyItem
+                    // 원하는 폰트 파일을 res/font 디렉토리에 추가한 후 R.font.custom_font로 참조
+                    val customTypeface = ResourcesCompat.getFont(this, R.font.pretendard600)
+
+                    // 폰트 설정
+                    chip.typeface = customTypeface
+                    // Chip 뷰의 크기 및 여백 설정
+                    val params = ChipGroup.LayoutParams(
+                        250, // 넓이 80
+                        150  // 높이 50
+                    )
+                    params.setMargins(8, 8, 8, 8) // 여백을 8로
+                    chip.layoutParams = params
+                    // 글씨 크기
+                    chip.textSize = 24f
+                    // 가운데 정렬
+                    chip.textAlignment = View.TEXT_ALIGNMENT_CENTER
                     chip.setChipBackgroundColorResource(R.color.red)
                     chip.setTextColor(Color.WHITE)
                     allergicChipGroup.addView(chip)
@@ -111,9 +156,9 @@ class UserInfoActivity : AppCompatActivity() {
             }
         }?:run{ // 사용자 정보 null일 시 -> 처리 조건 상 이 분기는 아마 진입할 일이 없긴 할 것
             // 나이 정보 표시
-            infoAge.text = "나이 정보 확인 실패"
+            infoAge.text = "-"
             // 성별 정보 표시
-            infoSex.text = "성별 정보 확인 실패"
+            infoSex.text = "-"
         }
 
 
@@ -121,6 +166,44 @@ class UserInfoActivity : AppCompatActivity() {
         userInfoChangeButton.setOnClickListener {
             val intent = Intent(this, UserInfoRegisterActivity::class.java)
             startActivity(intent)
+        }
+        if(auth.currentUser!!.isEmailVerified) {
+            googleConnectButton.isVisible = false
+            binding.googleLogoutButton.isVisible = true
+        }
+        else {
+            googleConnectButton.isVisible = true
+            binding.googleLogoutButton.isVisible = false
+        }
+        // 로그아웃 버튼 클릭 시
+        binding.googleLogoutButton.setOnClickListener{
+            val dialogView =
+                LayoutInflater.from(this).inflate(R.layout.activity_alert_dialog_login, null)
+
+            val alertDialogBuilder = AlertDialog.Builder(this)
+            val alertDialogBinding = ActivityAlertDialogDefaultBinding.inflate(layoutInflater)
+            alertDialogBuilder.setView(alertDialogBinding.root)
+
+            val alertDialog = alertDialogBuilder.create()
+
+            alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+            alertDialogBinding.rightBtn.setOnClickListener {
+                //Firebase.auth.signOut()
+                //moveTaskToBack(true)  // finish 후 다른 Activity 뜨지 않도록 함
+                //finish()  // 현재 액티비티 종료
+                //finishAffinity()  // 모든 루트 액티비티 종료
+                //overridePendingTransition(0, 0)   // 인텐트 애니메이션 종료
+            }
+
+            alertDialogBinding.leftBtn.setOnClickListener {
+                alertDialog.dismiss()
+            }
+
+            alertDialogBinding.title.text = "로그아웃"
+            alertDialogBinding.text.text = "로그아웃하시겠어요?\n로그아웃하시면 어플리케이션이 종료됩니다."
+
+            //alertDialog.show()
         }
         // Google 로그인 버튼 클릭 이벤트 처리
         googleConnectButton.setOnClickListener {
@@ -156,71 +239,6 @@ class UserInfoActivity : AppCompatActivity() {
         updateUI(currentUser)
     }
 
-    // 로그인 결과 처리 메서드
-    /*
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        Log.d("GOOGLE : ", "onActivityResult")
-        val googleCredential = oneTapClient.getSignInCredentialFromIntent(data)
-        val idToken = googleCredential.googleIdToken
-        when {
-            idToken != null -> {
-                // Got an ID token from Google. Use it to authenticate
-                // with Firebase.
-                val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-                auth.signInWithCredential(firebaseCredential)
-                    .addOnCompleteListener(this) { task ->
-                        if (task.isSuccessful) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("GOOGLE : ", "signInWithCredential:success")
-                            val user = auth.currentUser
-                            updateUI(user)
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("GOOGLE : ", "signInWithCredential:failure", task.exception)
-                            updateUI(null)
-                        }
-                    }
-            }
-
-            else -> {
-                // Shouldn't happen.
-                Log.d("GOOGLE : ", "No ID token!")
-            }
-        }
-    } // onActivityResult
-
-    // [START auth_with_google]
-    private fun firebaseAuthWithGoogle(idToken: String) {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d("GOOGLE : ", "signInWithCredential:success")
-                    val user = auth.currentUser
-                    updateUI(user)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w("GOOGLE : ", "signInWithCredential:failure", task.exception)
-                    updateUI(null)
-                }
-            }
-    }
-    // [END auth_with_google]
-
-    // [START signin]
-    private fun signIn() {
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
-    }
-    // [END signin]
-
-    companion object {
-        private const val RC_SIGN_IN = 9001
-    }
-    */
-
     private fun signIn() {
         val signInIntent = googleSignInClient.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
@@ -247,17 +265,71 @@ class UserInfoActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "signInWithCredential:success")
-                    Toast.makeText(this@UserInfoActivity, "성공!", Toast.LENGTH_LONG).show()
+                    Log.d("USERINFO UPDATE : ", "${AppUser.id} => ${AppUser.info!!.age}")
                     val user = auth.currentUser
                     updateUI(user)
-                    AppUser.id = user!!.uid
-                    Log.d(TAG, AppUser.id.toString())
-                    val intent = intent
-                    finish()
-                    startActivity(intent)
+                    Log.d("USERINFO UPDATE : ", "${AppUser.id} => ${user!!.uid}")
+
+                    // 안드로이드 파이어베이스에서 google 연동 정보 있는 지 확인함
+                    val db = Firebase.firestore
+                    // google 계정 uid가 포함된 데이터가 있는 지 확인, 있으면 그거 그대로 불러오고, 없으면 기존 싱긅톤 객체에 있던 데이터를 send함
+                    db.collection("userInfo")
+                        .whereEqualTo("userID", user.uid)
+                        .get()
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val result = task.result
+                                // 유저 정보가 firebase에 존재하는 경우
+                                if (result != null && !result.isEmpty) {
+                                    for (document in result) {
+                                        Log.d("FIRESTORE : ", "${document.id} => ${document.data}")
+
+                                        // Firebase 문서에서 사용자 정보 파싱하여 UserInfo 객체 생성
+                                        val user = UserInfo.parseFirebaseDoc(document)
+
+                                        AppUser.id = auth.currentUser!!.uid
+                                        AppUser.info?.age = user!!.age
+                                        AppUser.info?.gender = user!!.gender
+                                        AppUser.info = user
+                                        val intent = intent
+                                        finish()
+                                        startActivity(intent)
+
+                                    }
+                                } // 만약 유저 정보가 firebase에 존재하지 않는 경우
+                                else{
+                                    // 싱글톤 객체 유저 정보 업뎃
+                                    if (user != null) {
+                                        AppUser.id = user.uid
+                                        Log.d("USERINFO UPDATE2 : ", "${AppUser.id} => ${AppUser.info!!.age}")
+                                        val userInfo = hashMapOf(
+                                            "userID" to AppUser.id!!,
+                                            "userAge" to AppUser.info!!.age,
+                                            "userSex" to AppUser.info!!.gender,
+                                            "userDisease" to AppUser.info?.disease.let { ArrayList(it) },
+                                            "userAllergic" to AppUser.info?.allergic.let { ArrayList(it) }
+                                        )
+                                        sendData(userInfo, "userInfo")
+                                        val intent = intent
+                                        finish()
+                                        startActivity(intent)
+                                    }
+                                }
+                            } else {
+                                // 쿼리 중에 예외가 발생한 경우
+                                // 쿼리 실패의 경우 인터넷 연결 상태와도 연관이 있으므로
+                                // 추후 대응 필요성을 고려해 else문 분기 유지
+                                Log.d("HOMEFIRESTORE : ", "Error getting documents.", task.exception)
+                            }
+                        }
+
+
                 } else {
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
-                }
+                }//if(task.isSuccessful)
+
+                Log.d("USERINFO UPDATE2 : ", "${AppUser.id} => ${AppUser.info!!.age}")
+
             }
     }
 
@@ -269,6 +341,39 @@ class UserInfoActivity : AppCompatActivity() {
         private const val RC_SIGN_IN = 9001
     }
 
+    private fun sendData(userInfo : HashMap<String, Serializable>, collectionName : String){
+        val db = Firebase.firestore
+        db.collection(collectionName)
+            .add(userInfo)
+            .addOnSuccessListener { documentReference ->
+                Log.d("REGISTERFIRESTORE :", "SUCCESS added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.w("REGISTERFIRESTORE :", "Error adding document", e)
+            }
+    }
+    private fun deleteData(userId: String, collectionName: String, onSuccess: () -> Unit) {
+        val firestore = Firebase.firestore
+        firestore.collection(collectionName)
+            .whereEqualTo("userID", userId)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                for (document in querySnapshot) {
+                    // 찾은 문서를 삭제
+                    firestore.collection(collectionName)
+                        .document(document.id)
+                        .delete()
+                        .addOnCompleteListener {
+                            Log.d("REGISTERFIRESTORE : ", "DELETE SUCCESS")
+                            // 삭제 완료 시 onSuccess 호출
+                            onSuccess()
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("REGISTERFIRESTORE : ", "Error deleting documents.", exception)
+            }
+    }
 
 
 }
