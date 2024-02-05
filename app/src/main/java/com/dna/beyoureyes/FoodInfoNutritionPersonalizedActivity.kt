@@ -131,11 +131,16 @@ class FoodInfoNutritionPersonalizedActivity : AppCompatActivity() {
         val btnGeneral = binding.buttonGeneralize
 
         btnGeneral.setOnClickListener {
+            if (ttsManager.isSpeaking()) {
+                ttsManager.stop()
+                speakButton.text = "설명 듣기"
+            }
             finish()
             overridePendingTransition(R.anim.none, R.anim.none)
         }
 
         binding.buttonRetry.setOnClickListener {
+
             while(camera.start(this) == -1){
                 camera.start(this)
             }
@@ -167,7 +172,16 @@ class FoodInfoNutritionPersonalizedActivity : AppCompatActivity() {
                     "당신의 맞춤별 영양 정보를 분석해드리겠습니다. 해당 식품의 $calorieText 또한 영양 성분 정보는 당신의 일일 권장량 당 $nutrientsText 입니다." +
                             " 알레르기 정보는 인식되지 않았습니다. 추가적인 정보를 원하시면 화면에 다시 찍기 버튼을 눌러주세요. " +
                             "또한 해당 식품 섭취 시 먹기 버튼을 클릭하고 먹은 양의 정보를 알려주세요."
-                ttsManager.speak(textToSpeak)
+
+                if (ttsManager.isSpeaking()) {
+                    ttsManager.stop()
+                    speakButton.text = "설명 듣기"
+                } else {
+                    ttsManager.speak(textToSpeak)
+                    speakButton.text = "재생 중"
+                    ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
+                }
+                //ttsManager.speak(textToSpeak)
             }
         }
 
@@ -365,6 +379,9 @@ class FoodInfoNutritionPersonalizedActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+        }
         ttsManager.shutdown()
         super.onDestroy()
     }
@@ -380,10 +397,11 @@ class FoodInfoNutritionPersonalizedActivity : AppCompatActivity() {
         }
     }
     override fun onBackPressed() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+            speakButton.text = "설명 듣기"
+        }
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
-        if(isFinishing()){
-            overridePendingTransition(R.anim.none, R.anim.horizon_exit)
-        }
     }
 }

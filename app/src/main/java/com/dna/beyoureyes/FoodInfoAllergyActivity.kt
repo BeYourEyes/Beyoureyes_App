@@ -11,12 +11,12 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.content.Context
+import android.widget.Toast
 import com.dna.beyoureyes.databinding.ActivityFoodInfoAllergyBinding
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 
-
-import java.util.Locale
 
 class FoodInfoAllergyActivity : AppCompatActivity() {
 
@@ -81,7 +81,16 @@ class FoodInfoAllergyActivity : AppCompatActivity() {
 
                 val textToSpeak = "영양 정보를 분석해드리겠습니다. 해당 식품에는 ${allergyList?.joinToString(", ")}가 함유되어 있습니다. 영양 성분 정보는 인식되지 않았습니다. 추가적인 정보를 원하시면 화면에 다시 찍기 버튼을 눌러주세요."
 
-                ttsManager.speak(textToSpeak)
+                if (ttsManager.isSpeaking()) {
+                    ttsManager.stop()
+                    speakButton.text = "설명 듣기"
+                } else {
+                    ttsManager.speak(textToSpeak)
+                    speakButton.text = "재생 중"
+                    ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
+                }
+
+//                ttsManager.speak(textToSpeak)
             }
         }
 
@@ -105,6 +114,10 @@ class FoodInfoAllergyActivity : AppCompatActivity() {
 
             // 맞춤 정보 버튼 활성화
             personalButton.setOnClickListener {
+                if (ttsManager.isSpeaking()) {
+                    ttsManager.stop()
+                    speakButton.text = "설명 듣기"
+                }
                 startActivity(intent)
                 overridePendingTransition(R.anim.none, R.anim.none)
             }
@@ -117,6 +130,10 @@ class FoodInfoAllergyActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+            speakButton.text = "설명 듣기"
+        }
         val intent = Intent(this, HomeActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
@@ -136,6 +153,9 @@ class FoodInfoAllergyActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+        }
         ttsManager.shutdown()
         super.onDestroy()
 

@@ -152,7 +152,16 @@ class FoodInfoAllActivity : AppCompatActivity() {
                 val textToSpeak =
                     "영양 정보를 분석해드리겠습니다. $allergyText $calorieText 또한 영양 성분 정보는 1일 영양성분 기준치 당 $nutrientsText 입니다." +
                             " 해당 식품 섭취 시 먹기 버튼을 클릭하고 먹은 양의 정보를 알려주세요."
-                ttsManager.speak(textToSpeak)
+
+                if (ttsManager.isSpeaking()) {
+                    ttsManager.stop()
+                    speakButton.text = "음성 듣기"
+                } else {
+                    ttsManager.speak(textToSpeak)
+                    speakButton.text = "재생 중"
+                    ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
+                }
+            //    ttsManager.speak(textToSpeak)
             }
         }
 
@@ -332,6 +341,10 @@ class FoodInfoAllActivity : AppCompatActivity() {
 
             // 맞춤 정보 버튼 활성화
             personalButton.setOnClickListener {
+                if (ttsManager.isSpeaking()) {
+                    ttsManager.stop()
+                    speakButton.text = "설명 듣기"
+                }
                 startActivity(intent)
                 overridePendingTransition(R.anim.none, R.anim.none)
             }
@@ -344,6 +357,10 @@ class FoodInfoAllActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+            speakButton.text = "설명 듣기"
+        }
         val intent = Intent(this, HomeActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
@@ -426,6 +443,9 @@ class FoodInfoAllActivity : AppCompatActivity() {
 
 
     override fun onDestroy() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+        }
         ttsManager.shutdown()
         super.onDestroy()
     }
