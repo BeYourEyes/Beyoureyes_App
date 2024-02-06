@@ -123,7 +123,7 @@ class UserInfoActivity : BaseActivity() {
                 }
             }else{
                 val chip = Chip(this)
-                chip.text = "해당 없음"
+                chip.text = "없음"
                 // Chip 뷰의 크기 및 여백 설정
                 // 원하는 폰트 파일을 res/font 디렉토리에 추가한 후 R.font.custom_font로 참조
                 val customTypeface = ResourcesCompat.getFont(this, R.font.pretendard600)
@@ -172,7 +172,7 @@ class UserInfoActivity : BaseActivity() {
                 }
             }else{
                 val chip = Chip(this)
-                chip.text = "해당 없음"
+                chip.text = "없음"
                 // Chip 뷰의 크기 및 여백 설정
                 // 원하는 폰트 파일을 res/font 디렉토리에 추가한 후 R.font.custom_font로 참조
                 val customTypeface = ResourcesCompat.getFont(this, R.font.pretendard600)
