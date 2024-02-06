@@ -29,7 +29,7 @@ import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.Date
 
-class FoodInfoNutritionPersonalizedActivity : AppCompatActivity() {
+class FoodInfoNutritionPersonalizedActivity : BaseActivity() {
 
     private lateinit var ttsManager: TTSManager
     private lateinit var speakButton: Button
@@ -39,6 +39,7 @@ class FoodInfoNutritionPersonalizedActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityFoodInfoNutritionPersonalizedBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -48,8 +49,7 @@ class FoodInfoNutritionPersonalizedActivity : AppCompatActivity() {
         binding.include.toolbarTitle.text = "맞춤 영양 분석 결과"
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
         }
 
         // 먹기 버튼
@@ -118,11 +118,11 @@ class FoodInfoNutritionPersonalizedActivity : AppCompatActivity() {
         val userDVs = AppUser.info?.getDailyValues()
 
         // 권장량 대비 영양소 함유 퍼센트 표시 설정
-        AppUser.info?.disease?.let { disease -> // 사용자가 질환 있을 시
-            percentView.setWarningText(disease) // 경고 문구 설정
+        if(AppUser.hasDisease()){
+            percentView.setWarningText(AppUser.info!!.disease) // 경고 문구 설정
             percentView.setLineViews(this,
                 nutriFacts, userDVs, AppUser.info!!.getNutrisToCare())
-        }?:run{ // 질환 없을 시
+        }else {
             percentView.hideWarningText() // 경고 문구 없애기
             percentView.setLineViews(nutriFacts, userDVs)
         }
@@ -377,13 +377,6 @@ class FoodInfoNutritionPersonalizedActivity : AppCompatActivity() {
                     camera.processPhoto(this)
                 }
             }
-        }
-    }
-    override fun onBackPressed() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
-        if(isFinishing()){
-            overridePendingTransition(R.anim.none, R.anim.horizon_exit)
         }
     }
 }

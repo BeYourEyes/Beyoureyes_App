@@ -71,7 +71,7 @@ class AppFirstActivity : AppCompatActivity()  {
 
 
         }else{
-
+            overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, R.anim.none)
             startActivity(Intent(this, HomeActivity::class.java))
         }
 

@@ -18,7 +18,7 @@ import com.google.android.material.chip.ChipGroup
 
 import java.util.Locale
 
-class FoodInfoAllergyActivity : AppCompatActivity() {
+class FoodInfoAllergyActivity : BaseActivity() {
 
     private lateinit var ttsManager: TTSManager
     private lateinit var speakButton: Button
@@ -30,6 +30,7 @@ class FoodInfoAllergyActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityFoodInfoAllergyBinding.inflate(layoutInflater)  // Initialize the binding
         setContentView(binding.root)
 
@@ -39,14 +40,11 @@ class FoodInfoAllergyActivity : AppCompatActivity() {
         binding.include.toolbarTitle.text = "영양 분석 결과"
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
         }
 
         // 버튼 초기화
         speakButton = binding.buttonVoice
-
-
 
         // 알러지 정보 intent하여 표시
         val allergyChipGroup: ChipGroup = binding.allergyChipGroup
@@ -115,14 +113,6 @@ class FoodInfoAllergyActivity : AppCompatActivity() {
         }
 
     }
-
-    override fun onBackPressed() {
-        val intent = Intent(this, HomeActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        startActivity(intent)
-        finish()
-    }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

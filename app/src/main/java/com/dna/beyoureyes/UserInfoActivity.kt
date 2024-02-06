@@ -1,19 +1,14 @@
 package com.dna.beyoureyes
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
+//import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.dna.beyoureyes.databinding.ActivityAlertDialogDefaultBinding
@@ -35,23 +30,23 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.io.Serializable
 
-val diseaseKoreanList : List<String> = listOf("고혈압", "고지혈증", "당뇨")
-val allergyKoreanList : List<String> = listOf("메밀", "밀", "콩", "호두", "땅콩", "복숭아", "토마토", "돼지고기", "난류", "우유", "닭고기", "쇠고기", "새우", "고등어", "홍합", "전복", "굴", "조개류", "게", "오징어", "아황산")
+//val diseaseKoreanList : List<String> = listOf("고혈압", "고지혈증", "당뇨")
+//val allergyKoreanList : List<String> = listOf("메밀", "밀", "콩", "호두", "땅콩", "복숭아", "토마토", "돼지고기", "난류", "우유", "닭고기", "쇠고기", "새우", "고등어", "홍합", "전복", "굴", "조개류", "게", "오징어", "아황산")
 
-class UserInfoActivity : AppCompatActivity() {
-    private val userDiseaseList : ArrayList<String> = arrayListOf()
-    private val userAllergyList : ArrayList<String> = arrayListOf()
+class UserInfoActivity : BaseActivity() {
+    //private val userDiseaseList : ArrayList<String> = arrayListOf()
+    //private val userAllergyList : ArrayList<String> = arrayListOf()
 
     //google login을 위한 동작
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var oneTapClient: SignInClient
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var launcher: ActivityResultLauncher<Intent>
+    //private lateinit var launcher: ActivityResultLauncher<Intent>
     private lateinit var signInRequest: BeginSignInRequest
 
-    private val REQ_ONE_TAP = 2  // Can be any integer unique to the Activity
-    private var showOneTapUI = true
+    //private val REQ_ONE_TAP = 2  // Can be any integer unique to the Activity
+    //private var showOneTapUI = true
     private lateinit var binding: ActivityUserInfoBinding
 
 
@@ -60,7 +55,7 @@ class UserInfoActivity : AppCompatActivity() {
         binding = ActivityUserInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        overridePendingTransition(R.anim.horizon_enter, R.anim.horizon_exit)    // 화면 전환 시 애니메이션
+        //Firebase 연결
         Log.d(TAG, AppUser.id.toString()+"   AGAIN")
         auth = Firebase.auth
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -70,6 +65,7 @@ class UserInfoActivity : AppCompatActivity() {
         googleSignInClient = GoogleSignIn.getClient(this, gso)
         oneTapClient = Identity.getSignInClient(this)
 
+        // 뷰 바인딩
         val diseaseChipGroup = binding.diseaseChipGroup
         val allergicChipGroup  = binding.allergyChipGroup
         var sex : Int = 2
@@ -86,8 +82,7 @@ class UserInfoActivity : AppCompatActivity() {
         binding.include.toolbarTitle.text = "내 질환 확인하기"
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
         }
 
         // 사용자 정보 화면 표시 ---------------------------------------------
@@ -102,8 +97,8 @@ class UserInfoActivity : AppCompatActivity() {
                 2 -> infoSex.setText("정보가 없습니다. 추가해주세요!")
             }
             // 질환 정보 표시
-            it.disease?.let { diseaseArray ->
-                for (diseaseItem in diseaseArray) {
+            if (it.hasDisease()){
+                for (diseaseItem in it.disease) {
                     val chip = Chip(this)
                     chip.text = diseaseItem
                     // Chip 뷰의 크기 및 여백 설정
@@ -126,11 +121,33 @@ class UserInfoActivity : AppCompatActivity() {
                     chip.setTextColor(Color.WHITE)
                     diseaseChipGroup.addView(chip)
                 }
+            }else{
+                val chip = Chip(this)
+                chip.text = "해당 없음"
+                // Chip 뷰의 크기 및 여백 설정
+                // 원하는 폰트 파일을 res/font 디렉토리에 추가한 후 R.font.custom_font로 참조
+                val customTypeface = ResourcesCompat.getFont(this, R.font.pretendard600)
 
+                // 폰트 설정
+                chip.typeface = customTypeface
+                val params = ChipGroup.LayoutParams(
+                    250, // 넓이 80
+                    150  // 높이 50
+                )
+                params.setMargins(8, 8, 8, 8) // 여백을 8로
+                chip.layoutParams = params
+                // 글씨 크기
+                chip.textSize = 24f
+                // 가운데 정렬
+                chip.textAlignment = View.TEXT_ALIGNMENT_CENTER
+                chip.setChipBackgroundColorResource(R.color.grey)
+                chip.setTextColor(Color.WHITE)
+                diseaseChipGroup.addView(chip)
             }
+
             // 알러지 정보 표시
-            it.allergic?.let { allergyArray ->
-                for (allergyItem in allergyArray ) {
+            if ( it.hasAllergy()){
+                for (allergyItem in it.allergic ) {
                     val chip = Chip(this)
                     chip.text = allergyItem
                     // 원하는 폰트 파일을 res/font 디렉토리에 추가한 후 R.font.custom_font로 참조
@@ -153,6 +170,28 @@ class UserInfoActivity : AppCompatActivity() {
                     chip.setTextColor(Color.WHITE)
                     allergicChipGroup.addView(chip)
                 }
+            }else{
+                val chip = Chip(this)
+                chip.text = "해당 없음"
+                // Chip 뷰의 크기 및 여백 설정
+                // 원하는 폰트 파일을 res/font 디렉토리에 추가한 후 R.font.custom_font로 참조
+                val customTypeface = ResourcesCompat.getFont(this, R.font.pretendard600)
+
+                // 폰트 설정
+                chip.typeface = customTypeface
+                val params = ChipGroup.LayoutParams(
+                    250, // 넓이 80
+                    150  // 높이 50
+                )
+                params.setMargins(8, 8, 8, 8) // 여백을 8로
+                chip.layoutParams = params
+                // 글씨 크기
+                chip.textSize = 24f
+                // 가운데 정렬
+                chip.textAlignment = View.TEXT_ALIGNMENT_CENTER
+                chip.setChipBackgroundColorResource(R.color.grey)
+                chip.setTextColor(Color.WHITE)
+                allergicChipGroup.addView(chip)
             }
         }?:run{ // 사용자 정보 null일 시 -> 처리 조건 상 이 분기는 아마 진입할 일이 없긴 할 것
             // 나이 정보 표시
@@ -165,7 +204,7 @@ class UserInfoActivity : AppCompatActivity() {
         // 수정하기 버튼 클릭 시 작용
         userInfoChangeButton.setOnClickListener {
             val intent = Intent(this, UserInfoRegisterActivity::class.java)
-            startActivity(intent)
+            goToNext(intent)
         }
         if(auth.currentUser!!.isEmailVerified) {
             googleConnectButton.isVisible = false
@@ -225,12 +264,7 @@ class UserInfoActivity : AppCompatActivity() {
 
     } // onCreate
     // [START on_start_check_user]
-    override fun onBackPressed() {
-        val intent = Intent(this, HomeActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        startActivity(intent)
-        finish()
-    }
+
     override fun onStart() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.

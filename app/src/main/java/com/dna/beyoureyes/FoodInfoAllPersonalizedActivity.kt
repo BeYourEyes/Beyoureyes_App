@@ -32,7 +32,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 
-class FoodInfoAllPersonalizedActivity : AppCompatActivity() {
+class FoodInfoAllPersonalizedActivity : BaseActivity() {
 
     private lateinit var ttsManager: TTSManager
     private lateinit var speakButton: Button
@@ -41,6 +41,7 @@ class FoodInfoAllPersonalizedActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityFoodInfoAllPersonalizedBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -50,8 +51,7 @@ class FoodInfoAllPersonalizedActivity : AppCompatActivity() {
         binding.include.toolbarTitle.text = "맞춤 영양 분석 결과"
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
         }
 
         // intent로 전달받은 식품 정보 파싱
@@ -117,11 +117,11 @@ class FoodInfoAllPersonalizedActivity : AppCompatActivity() {
         val userDVs = AppUser.info?.getDailyValues()
 
         // 권장량 대비 영양소 함유 퍼센트 표시 설정
-        AppUser.info?.disease?.let { disease -> // 사용자가 질환 있을 시
-            percentView.setWarningText(disease) // 경고 문구 설정
+        if(AppUser.hasDisease()){
+            percentView.setWarningText(AppUser.info!!.disease) // 경고 문구 설정
             percentView.setLineViews(this,
                 nutriFacts, userDVs, AppUser.info!!.getNutrisToCare())
-        }?:run{ // 질환 없을 시
+        }else {
             percentView.hideWarningText() // 경고 문구 없애기
             percentView.setLineViews(nutriFacts, userDVs)
         }
@@ -131,9 +131,9 @@ class FoodInfoAllPersonalizedActivity : AppCompatActivity() {
         val allergyTextView = binding.allergyMsg
         val allergyChipView = AllergyChipView(allergyChipGroup, allergyTextView)
 
-        AppUser.info?.allergic?.let { userAllergy -> // 사용자 알러지 정보 꺼내기
+        if(AppUser.hasAllergy()){
             allergyList?.let { foodAllergy ->        // 식품 알러지 정보 꺼내기
-                allergyChipView.set(this, foodAllergy.toTypedArray(), userAllergy.toTypedArray())
+                allergyChipView.set(this, foodAllergy.toTypedArray(), AppUser.info!!.allergic.toTypedArray())
             }
         }
 
@@ -165,9 +165,10 @@ class FoodInfoAllPersonalizedActivity : AppCompatActivity() {
                     }
                 }
 
-                val allergyText = AppUser.info?.allergic?.let { userAllergy -> // 사용자 알러지 정보 꺼내기
+
+                val allergyText = AppUser.info?.let { // 사용자 알러지 정보 꺼내기
                     allergyList?.let { foodAllergy ->        // 식품 알러지 정보 꺼내기
-                        val commonAllergens = userAllergy.intersect(foodAllergy)
+                        val commonAllergens = it.allergic.intersect(foodAllergy)
                         if (commonAllergens.isNotEmpty()) {
                             "해당 식품에는 당신이 유의해야 할 ${commonAllergens.joinToString()}이 함유되어 있습니다."
                         } else {
@@ -382,12 +383,5 @@ class FoodInfoAllPersonalizedActivity : AppCompatActivity() {
     override fun onDestroy() {
         ttsManager.shutdown()
         super.onDestroy()
-    }
-    override fun onBackPressed() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
-        if(isFinishing()){
-            overridePendingTransition(R.anim.none, R.anim.horizon_exit)
-        }
     }
 }
