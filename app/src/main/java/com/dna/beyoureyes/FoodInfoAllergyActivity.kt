@@ -11,6 +11,8 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.content.Context
+import android.widget.Toast
 import com.dna.beyoureyes.databinding.ActivityFoodInfoAllergyBinding
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -30,7 +32,6 @@ class FoodInfoAllergyActivity : BaseActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityFoodInfoAllergyBinding.inflate(layoutInflater)  // Initialize the binding
         setContentView(binding.root)
 
@@ -45,6 +46,8 @@ class FoodInfoAllergyActivity : BaseActivity() {
 
         // 버튼 초기화
         speakButton = binding.buttonVoice
+
+
 
         // 알러지 정보 intent하여 표시
         val allergyChipGroup: ChipGroup = binding.allergyChipGroup
@@ -79,7 +82,16 @@ class FoodInfoAllergyActivity : BaseActivity() {
 
                 val textToSpeak = "영양 정보를 분석해드리겠습니다. 해당 식품에는 ${allergyList?.joinToString(", ")}가 함유되어 있습니다. 영양 성분 정보는 인식되지 않았습니다. 추가적인 정보를 원하시면 화면에 다시 찍기 버튼을 눌러주세요."
 
-                ttsManager.speak(textToSpeak)
+                if (ttsManager.isSpeaking()) {
+                    ttsManager.stop()
+                    speakButton.text = "설명 듣기 / ▶"
+                } else {
+                    ttsManager.speak(textToSpeak)
+                    speakButton.text = "재생 중 / ■"
+                    ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
+                }
+
+//                ttsManager.speak(textToSpeak)
             }
         }
 
@@ -113,6 +125,15 @@ class FoodInfoAllergyActivity : BaseActivity() {
         }
 
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+            speakButton.text = "설명 듣기 / ▶"
+        }
+    }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

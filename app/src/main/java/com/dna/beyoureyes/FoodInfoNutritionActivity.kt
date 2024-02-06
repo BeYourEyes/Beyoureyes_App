@@ -115,7 +115,16 @@ class FoodInfoNutritionActivity : BaseActivity() {
                             " 추가적인 정보를 원하시면 화면에 다시 찍기 버튼을 눌러주세요." +
                             " 또한 해당 식품 섭취 시 먹기 버튼을 클릭하고 먹은 양의 정보를 알려주세요."
 
-                ttsManager.speak(textToSpeak)
+                if (ttsManager.isSpeaking()) {
+                    ttsManager.stop()
+                    speakButton.text = "설명 듣기 / ▶"
+                } else {
+                    ttsManager.speak(textToSpeak)
+                    speakButton.text = "재생 중 / ■"
+                    ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
+                }
+
+                //ttsManager.speak(textToSpeak)
             }
         }
 
@@ -159,6 +168,10 @@ class FoodInfoNutritionActivity : BaseActivity() {
 
             // 맞춤 정보 버튼 활성화
             personalButton.setOnClickListener {
+                if (ttsManager.isSpeaking()) {
+                    ttsManager.stop()
+                    speakButton.text = "설명 듣기 / ▶"
+                }
                 startActivity(intent)
                 overridePendingTransition(R.anim.none, R.anim.none)
             }
@@ -298,6 +311,14 @@ class FoodInfoNutritionActivity : BaseActivity() {
 
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+            speakButton.text = "설명 듣기 / ▶"
+        }
+    }
+
     private fun applyBarChart(barChart: BarChart, entries: List<BarEntry>, color: String, maximum: Float) {
         // 바 차트의 데이터셋 생성
         val dataSet = BarDataSet(entries, "My Data")
@@ -380,6 +401,9 @@ class FoodInfoNutritionActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
+        if (ttsManager.isSpeaking()) {
+            ttsManager.stop()
+        }
         ttsManager.shutdown()
         super.onDestroy()
     }
