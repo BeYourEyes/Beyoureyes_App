@@ -143,7 +143,7 @@ class FoodInfoAllPersonalizedActivity : AppCompatActivity() {
         btnGeneral.setOnClickListener {
             if (ttsManager.isSpeaking()) {
                 ttsManager.stop()
-                speakButton.text = "설명 듣기"
+                speakButton.text = "설명 듣기 / ▶"
             }
             finish()
             overridePendingTransition(R.anim.none, R.anim.none)
@@ -186,10 +186,10 @@ class FoodInfoAllPersonalizedActivity : AppCompatActivity() {
                             " 해당 식품 섭취 시 먹기 버튼을 클릭하고 먹은 양의 정보를 알려주세요."
                 if (ttsManager.isSpeaking()) {
                     ttsManager.stop()
-                    speakButton.text = "음성 듣기"
+                    speakButton.text = "설명 듣기 / ▶"
                 } else {
                     ttsManager.speak(textToSpeak)
-                    speakButton.text = "재생 중"
+                    speakButton.text = "재생 중 / ■"
                     ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
                 }
                 //ttsManager.speak(textToSpeak)
@@ -401,10 +401,9 @@ class FoodInfoAllPersonalizedActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if (ttsManager.isSpeaking()) {
             ttsManager.stop()
-            speakButton.text = "설명 듣기"
+            speakButton.text = "설명 듣기 / ▶"
         }
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
-
     }
 }
