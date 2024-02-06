@@ -104,10 +104,10 @@ class TodayIntakeActivity : AppCompatActivity() {
 
                             if (ttsManager.isSpeaking()) {
                                 ttsManager.stop()
-                                speakButton.text = "설명 듣기"
+                                speakButton.text = "설명 듣기 / ▶"
                             } else {
                                 ttsManager.speak(textToSpeech)
-                                speakButton.text = "재생 중"
+                                speakButton.text = "재생 중 / ■"
                                 ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
                             }
 
@@ -184,10 +184,10 @@ class TodayIntakeActivity : AppCompatActivity() {
                                         "단백질은${totalIntake.protein?.getGram()}g 입니다. "
                             if (ttsManager.isSpeaking()) {
                                 ttsManager.stop()
-                                speakButton.text = "설명 듣기"
+                                speakButton.text = "설명 듣기 / ▶"
                             } else {
                                 ttsManager.speak(textToSpeak)
-                                speakButton.text = "재생 중"
+                                speakButton.text = "재생 중 / ■"
                                 ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
                             }
                             //ttsManager.speak(textToSpeak)
@@ -217,9 +217,10 @@ class TodayIntakeActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if (ttsManager.isSpeaking()) {
             ttsManager.stop()
-            speakButton.text = "설명 듣기"
+            speakButton.text = "설명 듣기 / ▶"
         }
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
     }
+
 }

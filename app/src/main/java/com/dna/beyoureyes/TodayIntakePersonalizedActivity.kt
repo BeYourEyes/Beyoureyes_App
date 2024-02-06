@@ -147,10 +147,10 @@ class TodayIntakePersonalizedActivity : AppCompatActivity() {
                             val textToSpeech = "오늘의 섭취량 기록이 없습니다. 분석 결과를 제공받기 위해서 기록을 남겨보세요."
                             if (ttsManager.isSpeaking()) {
                                 ttsManager.stop()
-                                speakButton.text = "설명 듣기"
+                                speakButton.text = "설명 듣기 / ▶"
                             } else {
                                 ttsManager.speak(textToSpeech)
-                                speakButton.text = "재생 중"
+                                speakButton.text = "재생 중 / ■"
                                 ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
                             }
                             //ttsManager.speak(textToSpeech)
@@ -228,10 +228,10 @@ class TodayIntakePersonalizedActivity : AppCompatActivity() {
                                 "${dateText.text}의 섭취량 기록을 분석해드리겠습니다.${totalCalorieTextView.text} 또한 오늘은" + reviewText
                             if (ttsManager.isSpeaking()) {
                                 ttsManager.stop()
-                                speakButton.text = "설명 듣기"
+                                speakButton.text = "설명 듣기 / ▶"
                             } else {
                                 ttsManager.speak(textToSpeech)
-                                speakButton.text = "재생 중"
+                                speakButton.text = "재생 중 / ■"
                                 ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
                             }
                             //ttsManager.speak(textToSpeech)
@@ -267,7 +267,7 @@ class TodayIntakePersonalizedActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if (ttsManager.isSpeaking()) {
             ttsManager.stop()
-            speakButton.text = "설명 듣기"
+            speakButton.text = "설명 듣기 / ▶"
         }
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)

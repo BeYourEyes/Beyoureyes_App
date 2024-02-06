@@ -118,10 +118,10 @@ class FoodInfoNutritionActivity : AppCompatActivity() {
 
                 if (ttsManager.isSpeaking()) {
                     ttsManager.stop()
-                    speakButton.text = "설명 듣기"
+                    speakButton.text = "설명 듣기 / ▶"
                 } else {
                     ttsManager.speak(textToSpeak)
-                    speakButton.text = "재생 중"
+                    speakButton.text = "재생 중 / ■"
                     ttsManager.showToast(this, "재생을 멈추려면 버튼을 다시 눌러주세요.")
                 }
 
@@ -171,7 +171,7 @@ class FoodInfoNutritionActivity : AppCompatActivity() {
             personalButton.setOnClickListener {
                 if (ttsManager.isSpeaking()) {
                     ttsManager.stop()
-                    speakButton.text = "설명 듣기"
+                    speakButton.text = "설명 듣기 / ▶"
                 }
                 startActivity(intent)
                 overridePendingTransition(R.anim.none, R.anim.none)
@@ -315,7 +315,7 @@ class FoodInfoNutritionActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if (ttsManager.isSpeaking()) {
             ttsManager.stop()
-            speakButton.text = "설명 듣기"
+            speakButton.text = "설명 듣기 / ▶"
         }
         val intent = Intent(this, HomeActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
