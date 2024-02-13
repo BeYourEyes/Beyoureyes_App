@@ -5,12 +5,14 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 //import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
+import androidx.core.view.setPadding
 import com.dna.beyoureyes.databinding.ActivityAlertDialogDefaultBinding
 import com.dna.beyoureyes.databinding.ActivityUserInfoBinding
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -108,8 +110,8 @@ class UserInfoActivity : BaseActivity() {
                     // 폰트 설정
                     chip.typeface = customTypeface
                     val params = ChipGroup.LayoutParams(
-                        250, // 넓이 80
-                        150  // 높이 50
+                        ChipGroup.LayoutParams.WRAP_CONTENT,
+                        ChipGroup.LayoutParams.WRAP_CONTENT
                     )
                     params.setMargins(8, 8, 8, 8) // 여백을 8로
                     chip.layoutParams = params
@@ -131,9 +133,9 @@ class UserInfoActivity : BaseActivity() {
                 // 폰트 설정
                 chip.typeface = customTypeface
                 val params = ChipGroup.LayoutParams(
-                    250, // 넓이 80
-                    150  // 높이 50
-                )
+                        ChipGroup.LayoutParams.WRAP_CONTENT,
+                        ChipGroup.LayoutParams.WRAP_CONTENT
+                    )
                 params.setMargins(8, 8, 8, 8) // 여백을 8로
                 chip.layoutParams = params
                 // 글씨 크기
@@ -157,8 +159,8 @@ class UserInfoActivity : BaseActivity() {
                     chip.typeface = customTypeface
                     // Chip 뷰의 크기 및 여백 설정
                     val params = ChipGroup.LayoutParams(
-                        250, // 넓이 80
-                        150  // 높이 50
+                        ChipGroup.LayoutParams.WRAP_CONTENT,
+                        ChipGroup.LayoutParams.WRAP_CONTENT
                     )
                     params.setMargins(8, 8, 8, 8) // 여백을 8로
                     chip.layoutParams = params
@@ -180,8 +182,8 @@ class UserInfoActivity : BaseActivity() {
                 // 폰트 설정
                 chip.typeface = customTypeface
                 val params = ChipGroup.LayoutParams(
-                    250, // 넓이 80
-                    150  // 높이 50
+                    ChipGroup.LayoutParams.WRAP_CONTENT,
+                    ChipGroup.LayoutParams.WRAP_CONTENT
                 )
                 params.setMargins(8, 8, 8, 8) // 여백을 8로
                 chip.layoutParams = params

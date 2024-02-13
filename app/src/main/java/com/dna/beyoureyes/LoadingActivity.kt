@@ -61,6 +61,7 @@ class LoadingActivity : AppCompatActivity() {
             val bitmap = BitmapFactory.decodeFile(filePath)
             if (bitmap != null) {
                 detectTextInBitmap(bitmap) // 필터링 알고리즘
+                //useTestInfo()
             } else {
                 Log.e("bitmap", "Bitmap is null") // 비트맵이 null일 때
             }
@@ -103,7 +104,7 @@ class LoadingActivity : AppCompatActivity() {
 
     }
 
-    private fun useTestInfo() {
+    private fun useTestNutriInfo() {
         // 추출 키워드 값 임의 설정
         koreanCharactersList.clear()
         koreanCharactersList.add("나트륨")
@@ -144,12 +145,19 @@ class LoadingActivity : AppCompatActivity() {
         kcalList.clear()
         kcalList.add("343")
 
+    }
 
+    private fun useTestAllergyInfo() {
         // 알레르기 값 설정
         extractedWords.clear()
         extractedWords.add("밀")
         extractedWords.add("땅콩")
         extractedWords.add("새우")
+    }
+
+    private fun useTestInfo() {
+        useTestNutriInfo()
+        useTestAllergyInfo()
     }
 
     private fun startFoodInfoAllActivity() {
