@@ -115,7 +115,7 @@ class RoundedHorizontalBarChartRenderer(
         if (mChart.barData.dataSetCount == 1 && mChart.barData.dataSets.size == 1) {
             val yValue = mChart.barData.dataSets[0].getEntryForIndex(0).y
             if (yValue < 20f) {
-                super.drawValue(c, valueText, x+100f*(1f-(yValue/20f)), y, color)
+                super.drawValue(c, valueText, x+100f*(1f-(yValue/20f)+0.18f), y, color)
             }
             else {
                 super.drawValue(c, valueText, x, y, color)
