@@ -1,2 +1,3 @@
-# Beyoureyes_App
-안드로이드 합친 버전
+# Beyoureyes_App 통합본
+당신의 안식
+
