@@ -20,4 +20,5 @@ rootProject.name = "BeYourEyes"
 include(":app")
 
 include(":opencv")
-project(":opencv").projectDir = File("C:\\Users\\sojin\\Downloads\\OpenCV-android-sdk\\sdk") // Change location!!!!
+//project(":opencv").projectDir = File("C:\\Users\\sojin\\Downloads\\OpenCV-android-sdk\\sdk") // Change location!!!!
+project(":opencv").projectDir = file("relative/path/to/OpenCV-android-sdk/sdk")
