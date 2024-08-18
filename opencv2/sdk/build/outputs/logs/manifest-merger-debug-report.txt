@@ -1,16 +1,16 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\sojin\AndroidStudioProjects\0815\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml:2:1-3:12
-INJECTED from C:\Users\sojin\AndroidStudioProjects\0815\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml:2:1-3:12
+ADDED from D:\Projects\Be_Your_Eyes\Android\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml:2:1-3:12
+INJECTED from D:\Projects\Be_Your_Eyes\Android\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml:2:1-3:12
 	package
-		INJECTED from C:\Users\sojin\AndroidStudioProjects\0815\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml
+		INJECTED from D:\Projects\Be_Your_Eyes\Android\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml
 	xmlns:android
-		ADDED from C:\Users\sojin\AndroidStudioProjects\0815\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml:2:11-69
+		ADDED from D:\Projects\Be_Your_Eyes\Android\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml:2:11-69
 uses-sdk
-INJECTED from C:\Users\sojin\AndroidStudioProjects\0815\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from C:\Users\sojin\AndroidStudioProjects\0815\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml
-INJECTED from C:\Users\sojin\AndroidStudioProjects\0815\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml
+INJECTED from D:\Projects\Be_Your_Eyes\Android\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from D:\Projects\Be_Your_Eyes\Android\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml
+INJECTED from D:\Projects\Be_Your_Eyes\Android\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml
 	android:targetSdkVersion
-		INJECTED from C:\Users\sojin\AndroidStudioProjects\0815\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml
+		INJECTED from D:\Projects\Be_Your_Eyes\Android\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from C:\Users\sojin\AndroidStudioProjects\0815\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml
+		INJECTED from D:\Projects\Be_Your_Eyes\Android\Beyoureyes_App\opencv2\sdk\java\AndroidManifest.xml

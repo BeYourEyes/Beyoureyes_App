@@ -5,23 +5,7 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-
-    <color name="red">#FF0000</color>
-    <color name="black">#FF161616</color>
+    <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-
-    <color name="highlight">#FF0000</color>
-    <color name="transparent">#00FFFFFF</color>
-    <color name="green">#FF34CA00</color>
-    <color name="darkgreen">#218100</color>
-    <color name="chartblue">#C1F1FC</color>
-    <color name="yellow">#F1BC00</color>
-    <color name="chartgreen">#C2FF00</color>
-    <color name="chartpink">#FFC2E5</color>
-    <color name="chartyellow">#F1BC00</color>
-    <color name="chartgrey">#E1E1E1</color>
-    <color name="grey">#777777</color>
-
-    <color name="highlight_pressed">#FF7070</color>
 
 </resources>

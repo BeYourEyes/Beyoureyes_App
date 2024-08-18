@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.dna.beyoureyes"
-    compileSdk = 33
+    compileSdk = 34
 
     viewBinding {
         enable = true
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId = "com.dna.beyoureyes"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 13
         versionName = "2.13"
 
