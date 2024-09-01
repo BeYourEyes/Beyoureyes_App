@@ -1,4 +1,36 @@
-# Beyoureyes_App 통합본
+## 당신의 안식 BeYourEyes 어플리케이션
+노인을 위한 영양정보 제공 앱 어플리케이션입니다.
+
+## :smiley: 개발자 
+<table>
+  <tr>
+    <td align="center">
+      <strong>이수진</strong><br>
+      <img src="https://github.com/user-attachments/assets/4da94270-5034-4152-a626-753d9f7b90a1" width="160"/><br>
+<a href="https://github.com/Soojin-Lee-01">@Soojin-Lee-01</a>
+    </td>
+    <td align="center">
+      <strong>이수진</strong><br>
+      <img src="https://github.com/user-attachments/assets/4da94270-5034-4152-a626-753d9f7b90a1" width="160"/><br>
+<a href="https://github.com/Soojin-Lee-01">@Soojin-Lee-01</a>
+    </td>
+    <td align="center">
+      <strong>이수진</strong><br>
+      <img src="https://github.com/user-attachments/assets/4da94270-5034-4152-a626-753d9f7b90a1" width="160"/><br>
+<a href="https://github.com/Soojin-Lee-01">@Soojin-Lee-01</a>
+    </td>
+  </tr>
+</table>
+
+
+## 사용스택
+
+
+## 앱 기능
+
+
+## 기능 역할
+
 당신의 안식
 ![슬라이드1](https://github.com/BeYourEyes/Beyoureyes_App/assets/87466284/b40cb4f6-1605-404e-b914-af8a8d394274)
 ![슬라이드3](https://github.com/BeYourEyes/Beyoureyes_App/assets/87466284/48bce1a8-02ad-4f20-ab2a-2c21d3f1a534)
