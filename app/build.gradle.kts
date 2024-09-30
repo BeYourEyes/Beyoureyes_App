@@ -93,5 +93,9 @@ dependencies {
     implementation ("androidx.camera:camera-view:1.2.0-alpha01")
     implementation ("androidx.camera:camera-extensions:1.2.0-alpha01")
 
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.13")
+
+
 
 }
