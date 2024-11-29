@@ -58,7 +58,7 @@
 
 ## 🧑‍🍳 Contributers
 
-##### 개발 기간 : 2023.08~2024.02
+##### 개발 기간 : 2023.04~2024.02
  ***2024.02.21 과학기술정보통신부장관상 대상 수상🏆***
 
 <table>
@@ -66,7 +66,7 @@
     <td align="center">
       <strong>문지영</strong><br>
       <img src="" width="160"/><br>
-<a href="https://github.com/Soojin-Lee-01">@Soojin-Lee-01</a>
+<a href="https://github.com/moon0900">@moon0900</a>
     </td>
     <td align="center">
       <strong>이수진</strong><br>
@@ -76,7 +76,7 @@
     <td align="center">
       <strong>이소영</strong><br>
       <img src="https://github.com/user-attachments/assets/6118a3f0-1934-4796-8c85-144c261d4ec5" height="200"/><br>
-<a href="https://github.com/Soojin-Lee-01">@Soojin-Lee-01</a>
+<a href="https://github.com/jordan-comlinee">@jordan-comlinee</a>
     </td>
   </tr>
 </table>
