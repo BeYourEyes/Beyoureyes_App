@@ -1,3 +1,6 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -6,9 +9,17 @@ plugins {
 
 }
 
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir).getProperty(propertyKey)
+}
+
+
+
 android {
     namespace = "com.dna.beyoureyes"
-    compileSdk = 33
+    compileSdk = 34
+
+
 
     viewBinding {
         enable = true
@@ -22,7 +33,15 @@ android {
         versionName = "2.13"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        //defaultConfig
+        buildConfigField("String", "OPEN_API_KEY", getApiKey("OPEN_API_KEY"))
+
     }
+    buildFeatures {
+        buildConfig = true // BuildConfig 활성화
+    }
+
+
 
     buildTypes {
         release {
@@ -44,6 +63,9 @@ android {
         baseline = file("lint-baseline.xml")
     }
 }
+
+
+
 
 dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
@@ -93,9 +115,16 @@ dependencies {
     implementation ("androidx.camera:camera-view:1.2.0-alpha01")
     implementation ("androidx.camera:camera-extensions:1.2.0-alpha01")
 
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.robolectric:robolectric:4.13")
 
+    // Retrofit
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    // Converter ( JSON 타입 결과를 객체로 매핑 )
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
-
+    // lifecycle-runtime-ktx 추가
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0") // 최신 버전을 사용하세요
 }
+
+
+
+
