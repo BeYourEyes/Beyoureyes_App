@@ -13,4 +13,20 @@ object AppUser {
     // 객체를 id, userInfo(기존 클래스) 속성을 갖도록 정의
     var id : String? = null
     var info : UserInfo? = null
+
+    fun hasDisease() : Boolean {
+        info?.let {
+            return it.disease.isNotEmpty()
+        }?: run {
+            return false
+        }
+    }
+
+    fun hasAllergy() : Boolean {
+        info?.let {
+            return it.allergic.isNotEmpty()
+        }?: run {
+            return false
+        }
+    }
 }

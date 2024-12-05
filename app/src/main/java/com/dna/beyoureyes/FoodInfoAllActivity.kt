@@ -33,7 +33,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class FoodInfoAllActivity : AppCompatActivity() {
+class FoodInfoAllActivity : BaseActivity() {
 
     private lateinit var ttsManager: TTSManager
     private lateinit var speakButton: Button
@@ -56,9 +56,7 @@ class FoodInfoAllActivity : AppCompatActivity() {
         binding.include.toolbarTitle.text = "영양 분석 결과"
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(R.anim.horizon_exit, R.anim.horizon_enter)
+            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
         }
 
         // 알러지 정보 intent하여 표시
@@ -75,9 +73,9 @@ class FoodInfoAllActivity : AppCompatActivity() {
 
                 // Chip 뷰의 크기 및 여백 설정
                 val params = ChipGroup.LayoutParams(
-                    250, // 넓이 80
-                    150  // 높이 50
-                )
+                        ChipGroup.LayoutParams.WRAP_CONTENT,
+                        ChipGroup.LayoutParams.WRAP_CONTENT
+                    )
                 params.setMargins(8, 8, 8, 8) // 여백을 8로..
                 chip.layoutParams = params
 
@@ -341,10 +339,6 @@ class FoodInfoAllActivity : AppCompatActivity() {
 
             // 맞춤 정보 버튼 활성화
             personalButton.setOnClickListener {
-                if (ttsManager.isSpeaking()) {
-                    ttsManager.stop()
-                    speakButton.text = "설명 듣기 / ▶"
-                }
                 startActivity(intent)
                 overridePendingTransition(R.anim.none, R.anim.none)
             }
@@ -357,10 +351,6 @@ class FoodInfoAllActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (ttsManager.isSpeaking()) {
-            ttsManager.stop()
-            speakButton.text = "설명 듣기 / ▶"
-        }
         val intent = Intent(this, HomeActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
@@ -443,9 +433,6 @@ class FoodInfoAllActivity : AppCompatActivity() {
 
 
     override fun onDestroy() {
-        if (ttsManager.isSpeaking()) {
-            ttsManager.stop()
-        }
         ttsManager.shutdown()
         super.onDestroy()
     }

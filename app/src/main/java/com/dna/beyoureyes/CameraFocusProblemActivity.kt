@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat
 import com.dna.beyoureyes.databinding.ActivityCameraFocusProblemBinding
 import org.opencv.android.OpenCVLoader
 
-class CameraFocusProblemActivity : AppCompatActivity()  {
+class CameraFocusProblemActivity : BaseActivity()  {
 
     // 권한 처리에 필요한 변수
     private lateinit var binding: ActivityCameraFocusProblemBinding
@@ -19,6 +19,7 @@ class CameraFocusProblemActivity : AppCompatActivity()  {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityCameraFocusProblemBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -28,9 +29,7 @@ class CameraFocusProblemActivity : AppCompatActivity()  {
         binding.include.toolbarTitle.text = "다시 촬영해주세요."
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(R.anim.horizon_exit, R.anim.horizon_enter)
+            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
         }
 
         // 카메라

@@ -27,16 +27,18 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:layout_marginBottom="128dp"
         android:gravity="center"
         android:maxLines="2"
-        android:textColor="@color/black"
         android:text="사진을 분석중입니다. \n 잠시만 기다려 주세요."
+        android:textColor="@color/black"
         android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loadingimage" />
 
     <ImageView
         android:id="@+id/loadingimage"

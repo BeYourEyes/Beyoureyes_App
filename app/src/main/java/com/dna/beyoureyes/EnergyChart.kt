@@ -670,8 +670,8 @@ class AllergyChipView(
 
                     // Chip 뷰의 크기 및 여백 설정
                     val params = ChipGroup.LayoutParams(
-                        250, // 넓이 80
-                        160  // 높이 50
+                        ChipGroup.LayoutParams.WRAP_CONTENT,
+                        ChipGroup.LayoutParams.WRAP_CONTENT
                     )
                     params.setMargins(8, 8, 8, 8) // 여백을 8로..
                     chip.layoutParams = params
@@ -702,9 +702,9 @@ class AllergyChipView(
 
             // Chip 뷰의 크기 및 여백 설정
             val params = ChipGroup.LayoutParams(
-                250, // 넓이 80
-                150  // 높이 50
-            )
+                        ChipGroup.LayoutParams.WRAP_CONTENT,
+                        ChipGroup.LayoutParams.WRAP_CONTENT
+                    )
             params.setMargins(8, 8, 8, 8) // 여백을 8로..
             chip.layoutParams = params
 

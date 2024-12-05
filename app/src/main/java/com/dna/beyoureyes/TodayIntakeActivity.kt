@@ -20,7 +20,7 @@ import org.threeten.bp.ZoneOffset
 
 import org.threeten.bp.format.DateTimeFormatter
 
-class TodayIntakeActivity : AppCompatActivity() {
+class TodayIntakeActivity : BaseActivity() {
 
     private lateinit var ttsManager: TTSManager
     private lateinit var speakButton: Button
@@ -40,8 +40,7 @@ class TodayIntakeActivity : AppCompatActivity() {
         binding.include.toolbarTitle.text = "오늘의 영양소 확인"
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
         }
 
         // Firebase 연결을 위한 설정값
@@ -212,15 +211,15 @@ class TodayIntakeActivity : AppCompatActivity() {
         }
         ttsManager.shutdown()
         super.onDestroy()
+
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         if (ttsManager.isSpeaking()) {
             ttsManager.stop()
             speakButton.text = "설명 듣기 / ▶"
         }
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
     }
 
 }

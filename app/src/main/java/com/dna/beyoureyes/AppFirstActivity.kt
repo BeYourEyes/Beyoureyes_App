@@ -72,7 +72,7 @@ class AppFirstActivity : AppCompatActivity()  {
 
 
         }else{
-
+            overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, R.anim.none)
             startActivity(Intent(this, HomeActivity::class.java))
         }
 
@@ -81,6 +81,7 @@ class AppFirstActivity : AppCompatActivity()  {
 
     //앱최초실행확인 (true-최초실행)
     fun isAppFirstExecute() : Boolean {
+        // SharedPreferences : 안드로이드 내장된 API 먼저 여기의 키 값을 확인해서 앱 실행된적 있는지 확인!
         val pref : SharedPreferences = getSharedPreferences("IsFirst", Activity.MODE_PRIVATE)
         val isSecond : Boolean = pref.getBoolean("isSecond", false);
         if(!isSecond){

@@ -29,8 +29,8 @@ android {
         applicationId = "com.dna.beyoureyes"
         minSdk = 24
         targetSdk = 33
-        versionCode = 6
-        versionName = "2.0"
+        versionCode = 13
+        versionName = "2.13"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         //defaultConfig
@@ -59,13 +59,17 @@ android {
     kotlinOptions {
         jvmTarget = "18"
     }
+     lint {
+        baseline = file("lint-baseline.xml")
+    }
 }
 
 
 
 
 dependencies {
-
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.8.0")
@@ -97,7 +101,7 @@ dependencies {
 
 
     //openCV
-    implementation(project(":opencv"))
+    implementation(project(":opencv2"))
 
     implementation ("com.google.android.gms:play-services-mlkit-text-recognition-common:17.0.0")
     implementation ("com.google.android.material:material:1.6.0")
@@ -111,6 +115,7 @@ dependencies {
     implementation ("androidx.camera:camera-view:1.2.0-alpha01")
     implementation ("androidx.camera:camera-extensions:1.2.0-alpha01")
 
+
     // Retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     // Converter ( JSON 타입 결과를 객체로 매핑 )
@@ -119,3 +124,7 @@ dependencies {
     // lifecycle-runtime-ktx 추가
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0") // 최신 버전을 사용하세요
 }
+
+
+
+

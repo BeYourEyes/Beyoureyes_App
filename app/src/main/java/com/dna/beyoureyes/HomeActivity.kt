@@ -19,7 +19,7 @@ import com.google.firebase.ktx.Firebase
 import org.opencv.android.OpenCVLoader
 
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : BaseActivity() {
 
     // onBackPressed
     private var time: Long = 0
@@ -29,8 +29,6 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        overridePendingTransition(R.anim.horizon_enter, R.anim.horizon_exit)
 
         //openCV
         OpenCVLoader.initDebug()
@@ -58,6 +56,7 @@ class HomeActivity : AppCompatActivity() {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val result = task.result
+
                         // 유저 정보가 이미 존재하는 경우
                         if (result != null && !result.isEmpty) {
                             for (document in result) {
@@ -65,7 +64,6 @@ class HomeActivity : AppCompatActivity() {
 
                                 // Firebase 문서에서 사용자 정보 파싱하여 UserInfo 객체 생성
                                 val user = UserInfo.parseFirebaseDoc(document)
-
                                 // 싱글톤 객체 유저 정보 업뎃
                                 if (user != null) {
                                     AppUser.info = user
@@ -98,12 +96,12 @@ class HomeActivity : AppCompatActivity() {
                 val intent = Intent(this, UserInfoActivity::class.java)
                 Log.d("HOMEFIRESTORE : ", "success_1")
                 //Toast.makeText(this@HomeActivity, "TRUE", Toast.LENGTH_LONG).show()
-                startActivity(intent)
+                goToNext(intent)
             } else { //userInfo가 없는 경우
                 val intent = Intent(this, UserInfoRegisterActivity::class.java)
                 Log.d("HOMEFIRESTORE : ", "success_-1")
                 //Toast.makeText(this@HomeActivity, "FALSE", Toast.LENGTH_LONG).show()
-                startActivity(intent)
+                goToNext(intent)
             }
         } // 사용자정보존재, 존재하지않음 2가지로만 분기 축소
 
@@ -111,17 +109,17 @@ class HomeActivity : AppCompatActivity() {
         filmButton.setOnClickListener {
             // val intent = Intent(this, CameraFirstActivity::class.java)
             val intent = Intent(this, NutriCautionActivity::class.java)
-            startActivity(intent)
+            goToNext(intent)
         }
         // 오늘 섭취한 영양소 확인하기 버튼
         todayIntakeButton.setOnClickListener {
             if (AppUser.info != null) { // 사용자 정보 있을 시 맞춤 섭취량 통계 화면으로 연결
                 // 이제 사용자 정보 인텐트 파라미터로 전달할 필요X
                 val intent = Intent(this, TodayIntakePersonalizedActivity::class.java)
-                startActivity(intent)
+                goToNext(intent)
             } else {// 사용자 정보 없을 시 일반 통계 화면으로 연결
                 val intent = Intent(this, TodayIntakeActivity::class.java)
-                startActivity(intent)
+                goToNext(intent)
             }
         }
         // 나가기 버튼

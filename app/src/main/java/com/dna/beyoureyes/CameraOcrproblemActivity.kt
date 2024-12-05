@@ -12,13 +12,14 @@ import androidx.core.content.ContextCompat
 import com.dna.beyoureyes.databinding.ActivityCameraOcrproblemBinding
 import org.opencv.android.OpenCVLoader
 
-class CameraOcrproblemActivity : AppCompatActivity() {
+class CameraOcrproblemActivity : BaseActivity() {
 
     private lateinit var binding: ActivityCameraOcrproblemBinding
     private val camera = Camera()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityCameraOcrproblemBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -28,9 +29,7 @@ class CameraOcrproblemActivity : AppCompatActivity() {
         binding.include.toolbarTitle.text = "다시 촬영해주세요."
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(R.anim.horizon_exit, R.anim.horizon_enter)
+            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
         }
 
         // 카메라

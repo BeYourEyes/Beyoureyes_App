@@ -12,7 +12,7 @@ import android.content.Intent
 import com.dna.beyoureyes.databinding.ActivityFoodInfoAllergyPersonalizedBinding
 import com.google.android.material.chip.ChipGroup
 
-class FoodInfoAllergyPersonalizedActivity : AppCompatActivity() {
+class FoodInfoAllergyPersonalizedActivity : BaseActivity() {
 
     private lateinit var ttsManager: TTSManager
     private lateinit var speakButton: Button
@@ -32,8 +32,7 @@ class FoodInfoAllergyPersonalizedActivity : AppCompatActivity() {
         binding.include.toolbarTitle.text = "맞춤 영양 분석 결과"
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
         }
 
         // intent로 전달받은 식품 정보 파싱
@@ -50,12 +49,11 @@ class FoodInfoAllergyPersonalizedActivity : AppCompatActivity() {
 
         val allergyChipView = AllergyChipView(allergyChipGroup, allergyTextView)
 
-        AppUser.info?.allergic?.let { userAllergy -> // 사용자 알러지 정보 꺼내기
+        if (AppUser.hasAllergy()){
             allergyList?.let { foodAllergy ->        // 식품 알러지 정보 꺼내기
-                allergyChipView.set(this, foodAllergy.toTypedArray(), userAllergy.toTypedArray())
+                allergyChipView.set(this, foodAllergy.toTypedArray(), AppUser.info!!.allergic.toTypedArray())
             }
         }
-
 
         binding.buttonRetry.setOnClickListener {
             while (camera.start(this) == -1) {
@@ -79,9 +77,9 @@ class FoodInfoAllergyPersonalizedActivity : AppCompatActivity() {
         ttsManager = TTSManager(this) {
             // 버튼 눌렀을 때 TTS 실행
             speakButton.setOnClickListener {
-                AppUser.info?.allergic?.let { userAllergy -> // 사용자 알러지 정보 꺼내기
+                if(AppUser.hasAllergy()){
                     allergyList?.let { foodAllergy ->        // 식품 알러지 정보 꺼내기
-                        val commonAllergens = userAllergy.intersect(foodAllergy)
+                        val commonAllergens = AppUser.info!!.allergic.intersect(foodAllergy)
                         if (commonAllergens.isNotEmpty()) {
                             val allergyMsg =
                                 "당신의 맞춤별 영양 정보를 분석해드리겠습니다. 해당 식품에는 당신이 유의해야 할 ${commonAllergens.joinToString()}이 함유되어 있습니다. 영양 성분 정보는 인식되지 않았습니다. 추가적인 정보를 원하시면 화면에 다시찍기 버튼을 눌러주세요"
@@ -137,11 +135,10 @@ class FoodInfoAllergyPersonalizedActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         if (ttsManager.isSpeaking()) {
             ttsManager.stop()
             speakButton.text = "설명 듣기 / ▶"
         }
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
     }
 }
