@@ -24,7 +24,7 @@ import org.threeten.bp.format.DateTimeFormatter
 import com.jakewharton.threetenabp.AndroidThreeTen
 import java.util.Locale
 
-class TodayIntakePersonalizedActivity : BaseActivity() {
+class TodayIntakePersonalizedActivity : AppCompatActivity() {
 
     private lateinit var ttsManager: TTSManager
     private lateinit var speakButton: Button
@@ -34,6 +34,7 @@ class TodayIntakePersonalizedActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityTodayIntakePersonalizedBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        overridePendingTransition(R.anim.horizon_enter, R.anim.horizon_exit)
 
         // 툴바
         setSupportActionBar(binding.include.toolbarDefault)
@@ -41,7 +42,8 @@ class TodayIntakePersonalizedActivity : BaseActivity() {
         binding.include.toolbarTitle.text = "오늘의 영양소 확인"
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
         }
 
         // 버튼 초기화
@@ -263,11 +265,12 @@ class TodayIntakePersonalizedActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
         if (ttsManager.isSpeaking()) {
             ttsManager.stop()
             speakButton.text = "설명 듣기 / ▶"
         }
+        val intent = Intent(this, HomeActivity::class.java)
+        startActivity(intent)
     }
 
 }

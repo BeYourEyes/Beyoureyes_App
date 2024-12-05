@@ -18,6 +18,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "BeYourEyes"
 include(":app")
-include(":opencv2")
-project(":opencv2").projectDir = File("opencv2/sdk") // Change location!!!!
 
+include(":opencv")
+project(":opencv").projectDir = File("C:\\Users\\sojin\\Downloads\\OpenCV-android-sdk\\sdk") // Change location!!!!

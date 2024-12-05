@@ -29,7 +29,7 @@ import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.Date
 
-class FoodInfoNutritionPersonalizedActivity : BaseActivity() {
+class FoodInfoNutritionPersonalizedActivity : AppCompatActivity() {
 
     private lateinit var ttsManager: TTSManager
     private lateinit var speakButton: Button
@@ -39,7 +39,6 @@ class FoodInfoNutritionPersonalizedActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityFoodInfoNutritionPersonalizedBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -49,7 +48,8 @@ class FoodInfoNutritionPersonalizedActivity : BaseActivity() {
         binding.include.toolbarTitle.text = "맞춤 영양 분석 결과"
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
         }
 
         // 먹기 버튼
@@ -118,11 +118,11 @@ class FoodInfoNutritionPersonalizedActivity : BaseActivity() {
         val userDVs = AppUser.info?.getDailyValues()
 
         // 권장량 대비 영양소 함유 퍼센트 표시 설정
-        if(AppUser.hasDisease()){
-            percentView.setWarningText(AppUser.info!!.disease) // 경고 문구 설정
+        AppUser.info?.disease?.let { disease -> // 사용자가 질환 있을 시
+            percentView.setWarningText(disease) // 경고 문구 설정
             percentView.setLineViews(this,
                 nutriFacts, userDVs, AppUser.info!!.getNutrisToCare())
-        }else {
+        }?:run{ // 질환 없을 시
             percentView.hideWarningText() // 경고 문구 없애기
             percentView.setLineViews(nutriFacts, userDVs)
         }
@@ -397,10 +397,11 @@ class FoodInfoNutritionPersonalizedActivity : BaseActivity() {
         }
     }
     override fun onBackPressed() {
-        super.onBackPressed()
         if (ttsManager.isSpeaking()) {
             ttsManager.stop()
             speakButton.text = "설명 듣기 / ▶"
         }
+        val intent = Intent(this, HomeActivity::class.java)
+        startActivity(intent)
     }
 }
