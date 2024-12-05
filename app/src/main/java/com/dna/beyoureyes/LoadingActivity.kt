@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.widget.Button
+
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.dna.beyoureyes.databinding.ActivityLoadingBinding
@@ -16,6 +17,9 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions
 import java.io.File
+import androidx.lifecycle.lifecycleScope
+import com.google.mlkit.vision.text.Text
+import kotlinx.coroutines.launch
 
 
 class LoadingActivity : AppCompatActivity() {
@@ -44,6 +48,8 @@ class LoadingActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         binding = ActivityLoadingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -69,11 +75,11 @@ class LoadingActivity : AppCompatActivity() {
             Log.e("bitmap", "File path is null") // 파일 경로가 null일 때
         }
 
-
+        ////////// OCR 인식 후 결과에 따라 분석 화면 제공 - 버튼 자동 눌림 /////////////
         resultbtn.setOnClickListener {
 
-            //textView.append(moPercentList.toString())
-
+            Log.d("final_mo", moPercentList.toString())
+            Log.d("final_kacl", kcalList.toString())
             val isValidData = isValidData()
             val isValidAllergyData = isValidData_alergy()
             val hasValidKeywordOrder = checkKeywordOrder(koreanCharactersListmodi)
@@ -102,6 +108,115 @@ class LoadingActivity : AppCompatActivity() {
         }, 4000) // 4초
 
     }
+
+    ////////// OPEN API로 식품 분석 결과 가져올 클래스 /////////////
+    data class NutrientResult(
+
+        val prot: Int,   // 단백질
+        val fatce: Int,  // 지방
+        val chocdf: Int, // 탄수화물
+        val sugar: Int,  // 당류
+        val nat: Int,    // 나트륨
+        val chole: Int,  // 콜레스테롤
+        val fasat: Int   // 포화지방산
+
+    )
+
+    ////////// OPEN API 호출 함수 - 식품품목보고번호 이용 /////////////
+    private suspend fun fetchFoodData(
+        pageNo: String,
+        numOfRows: String,
+        type: String,
+        itemMnftrRptNo: String
+    ): List<NutrientResult>? {
+        return try {
+            val response = RetrofitClient.apiService.getFood(
+                pageNo = pageNo,
+                numOfRows = numOfRows,
+                type = type,
+                itemMnftrRptNp = itemMnftrRptNo
+            )
+            val items = response.response.body.items
+
+            Log.d("Items_success", items.toString())
+            ////////// foodSize 기준으로 mg 계산 함수 /////////////
+            calculateNutrient(items)
+        } catch (e: Exception) {
+            Log.e("ApiResponse", "API 호출 실패: ${e.message}")
+            null
+        }
+    }
+
+    ////////// OPEN API 호출 결과를 moPercentList로 저장 함수 /////////////
+    private fun processFoodData(itemMnftrRptNo: String, onComplete: () -> Unit) {
+        lifecycleScope.launch {
+            val nutrientResults = fetchFoodData("1", "100", "json", itemMnftrRptNo)
+            if (!nutrientResults.isNullOrEmpty()) {
+                // nutrientResults의 각 필드 값을 String으로 변환하여 리스트에 추가
+                moPercentList = nutrientResults.flatMap { result ->
+                    listOf(
+                        result.prot.toString(),
+                        result.fatce.toString(),
+                        result.chocdf.toString(),
+                        result.sugar.toString(),
+                        result.nat.toString(),
+                        result.chole.toString(),
+                        result.fasat.toString()
+                    )
+                }
+
+                Log.d("moPercentList", moPercentList.toString())
+
+                Log.d("ApiResponse", "API 데이터 처리 성공: ${moPercentList}")
+                Log.d("ApiResponse_kcal", "API 데이터 처리 성공: ${kcalList}")
+            } else {
+                Log.e("ApiResponse", "API 호출 실패. OCR 데이터를 사용합니다.")
+            }
+            onComplete()
+        }
+    }
+
+    ////////// OPEN API로 가져온 데이터 foodSize 기준으로 mg 계산 함수 /////////////
+    private fun calculateNutrient(items: List<ApiResponse.Item>): List<NutrientResult> {
+        val result = mutableListOf<NutrientResult>()
+        for (item in items) {
+            val rawNatValue = item.nat
+            val natDouble = rawNatValue?.toDoubleOrNull()
+            Log.d("Debug_nat", "Raw value: $rawNatValue, Converted value: $natDouble")
+
+            //val foodSize = item.foodSize.toDoubleOrNull() ?: 1.0
+            // foodSize 디버깅
+            val rawFoodSize = item.foodSize
+            // 정규식을 사용하여 숫자만 추출
+            val foodSize = rawFoodSize?.replace("[^\\d.]".toRegex(), "")?.toDoubleOrNull() ?: 1.0
+            Log.d("Debug_foodSize", "Raw foodSize: $rawFoodSize, Extracted foodSize: $foodSize")
+
+
+            val prot = ((item.prot.toDoubleOrNull() ?: 0.0)  / 100.0 * foodSize).toInt()
+            val fatce = ((item.fatce.toDoubleOrNull() ?: 0.0) / 100.0 * foodSize).toInt()
+            val chocdf = ((item.chocdf.toDoubleOrNull() ?: 0.0)/ 100.0 * foodSize).toInt()
+            val sugar = ((item.sugar.toDoubleOrNull() ?: 0.0) / 100.0 * foodSize).toInt()
+            val nat = ((item.nat.toDoubleOrNull() ?: 0.0) / 100.0 * foodSize).toInt()
+            val chole = ((item.chole.toDoubleOrNull() ?: 0.0) / 100.0 * foodSize).toInt()
+            val fasat = ((item.fasat.toDoubleOrNull() ?: 0.0)/ 100.0 * foodSize).toInt()
+            Log.d("kcal_s", item.enerc)
+            val kcal = ((item.enerc.toDoubleOrNull() ?: 0.0)/ 100.0 * foodSize).toInt().toString()
+
+            Log.d("nat_succes", nat.toString())
+            Log.d("kcal_succes", kcal)
+
+            Log.d("Debug_Result_Values", "prot: $prot, fatce: $fatce, chocdf: $chocdf, sugar: $sugar, nat: $nat, chole: $chole, fasat: $fasat")
+
+
+            val nutrientResult = NutrientResult(prot, fatce, chocdf, sugar, nat, chole, fasat)
+            Log.d("Debug_NutrientResult", nutrientResult.toString())
+            result.add(nutrientResult)
+            kcalList.add(kcal)
+            Log.d("Nutri", result.toString())
+        }
+        return result
+    }
+
 
     private fun useTestInfo() {
         // 추출 키워드 값 임의 설정
@@ -152,6 +267,7 @@ class LoadingActivity : AppCompatActivity() {
         extractedWords.add("새우")
     }
 
+    ////////// 모든 정보 받아오는데 성공 /////////////
     private fun startFoodInfoAllActivity() {
         val intent = Intent(this, FoodInfoAllActivity::class.java)
         intent.putExtra("modifiedPercentList", ArrayList(moPercentList))
@@ -162,12 +278,14 @@ class LoadingActivity : AppCompatActivity() {
 
     }
 
+    ////////// 영양소 함류량 정보만 받아오는데 성공 /////////////
     private fun startFoodInfoNutritionActivity() {
         val intent = Intent(this, FoodInfoNutritionActivity::class.java)
         configureIntent(intent)
         startActivity(intent)
     }
 
+    ////////// 알레르기 정보만 받아오는데 성공 /////////////
     private fun startFoodInfoAllergyActivity() {
         val intent = Intent(this, FoodInfoAllergyActivity::class.java)
         intent.putStringArrayListExtra("allergyList", ArrayList(extractedWords.toList()))
@@ -186,7 +304,7 @@ class LoadingActivity : AppCompatActivity() {
         handler.removeCallbacksAndMessages(null) // 핸들러 제거
     }
 
-    // 한글 키워드의 순서 확인하는 함수
+    ////////// OCR API 호출 시 - 한글 키워드 순서 확인 함수 /////////////
     private fun checkKeywordOrder(keywordList: List<String>): Boolean {
         val targetKeywords = listOf("나트", "탄수화", "당류", "지방", "트랜스", "포화", "콜레스", "단백질")
 
@@ -243,10 +361,38 @@ class LoadingActivity : AppCompatActivity() {
             .show()
     }
 
-    // 제외할 단어를 고려한 텍스트 인식 함수
+    ////////// OPEN API 호출 시 - 품목보고번호 문자 추출 /////////////
+    private fun extractItemMnftrRptNo(lines: List<String>): String? {
+        val keyword = "품목보고번호"
+        val itemMnftrRptNoPattern = "\\d+".toRegex()
+
+        for (lineText in lines) {
+            if (lineText.contains(keyword)) {
+                // "품목보고번호" 바로 옆에 있는 번호 추출
+                val keywordIndex = lineText.indexOf(keyword) + keyword.length
+                val numberPart = lineText.substring(keywordIndex).trim()
+                val match = itemMnftrRptNoPattern.find(numberPart)
+
+                if (match != null) {
+                    val itemMnftrRptNo = match.value
+                    Log.d("ItemMnftrRptNo", "Found itemMnftrRptNo: $itemMnftrRptNo")
+                    return itemMnftrRptNo
+                } else {
+                    Log.d("ItemMnftrRptNo", "No number found next to keyword '$keyword' in the line.")
+                }
+            }
+        }
+        //Log.d("ItemMnftrRptNo", "Keyword '$keyword' not found in the text.")
+        return null
+    }
+
+    /*
+    1. "품목보고번호" 추출 성공하면 -> OPEN API 호출
+    2. "품목보고번호" 추출 실패하면 -> OCR API 호출
+    */
     private fun detectTextInBitmap(bitmap: Bitmap) {
         try {
-            // 새 이미지를 처리하기 전에 세트와 리스트를 초기화!
+            // 초기화
             koreanCharactersList.clear()
             koreanCharactersListmodi.clear()
             gList.clear()
@@ -255,101 +401,110 @@ class LoadingActivity : AppCompatActivity() {
             val image = InputImage.fromBitmap(bitmap, 0)
             textRecognizer.process(image)
                 .addOnSuccessListener { result ->
-                    // 알레르기 필터링 알고리즘 병합
-                    val targetWords = listOf(
-                        "메밀", "밀", "대두", "땅콩", "호두", "잣", "계란",
-                        "아황산류", "복숭아", "토마토", "난류", "우유", "새우",
-                        "고등어", "오징어", "게", "조개류", "돼지고기", "쇠고기", "닭고기"
-                    )
-
-
-                    var foundHamuIndex: Int? = null // 함유 인덱스 파악 위해
-
                     val lines = result.text.split('\n')
+                    val itemMnftrRptNo = extractItemMnftrRptNo(lines)
 
-                    for ((index, lineText) in lines.withIndex()) {
-                        if (lineText.contains("함유")) {
-                            foundHamuIndex = index
-
-                            val previousLineIndex = index - 1
-                            if (previousLineIndex >= 0) {
-                                val previousLineText = lines[previousLineIndex]
-                                for (targetWord in targetWords) {
-                                    if (previousLineText.contains(targetWord)) {
-                                        extractedWords.add(targetWord)
-                                    }
-                                }
+                    if (itemMnftrRptNo != null) {
+                        // 품목보고번호가 있는 경우
+                        Log.d("success", itemMnftrRptNo)
+                        processFoodData(itemMnftrRptNo) {
+                            // OPEN API 호출 성공 시 알레르기 추출
+                            Log.d("open_api_result", moPercentList.toString())
+                            if (moPercentList.isNotEmpty()) {
+                                extractAllergyData(lines)
+                            } else {
+                                // OPEN API 실패 시 OCR API로 처리
+                                extractOcrData(result)
                             }
                         }
-
-                        if (foundHamuIndex != null && foundHamuIndex == index) {
-                            for (targetWord in targetWords) {
-                                if (lineText.contains(targetWord)) {
-                                    extractedWords.add(targetWord)
-                                }
-                            }
-                        }
-
+                    } else {
+                        // 품목보고번호가 없는 경우: OCR 데이터 처리
+                        extractOcrData(result)
                     }
-                    val allRecognizedWords = result.text
-                    val extractedText = extractedWords.joinToString(", ")
-                    runOnUiThread { // OCR 결과 학인 위해.. 나중에 제거할 예정
-                        //textView.append("감지된 텍스트: $extractedText\n")
-                        // textView.append("모든 인식된 텍스트: $allRecognizedWords\n")
-                    }
-                    for (block in result.textBlocks) {
-                        for (line in block.lines) {
-                            for (element in line.elements) {
-                                val elementText = element.text
-                                //특정 키워드 확인, 한글 Set는 요소별로 추출
-                                for (keyword in keywords) {
-                                    if (elementText.contains(keyword)) {
-                                        // 키워드를 한글 문자 Set에 추가
-                                        koreanCharactersList.add(elementText)
-                                        // replaceKoreanCharacters(koreanCharactersSet)
-                                    }
-                                }
-                            }
-                            val lineText = line.text
-                            val lineInfo = "라인 텍스트: $lineText" // 전체 인식한 라인 텍스트 출력
-                            runOnUiThread { // OCR 결과 학인 위해.. 나중에 제거할 예정
-     //                           textView.append("$lineInfo\n")
-                            }
-
-                            // "숫자 g" 형태 확인
-                            extractNumberG(lineText)
-
-                            // "%" 형태 확인
-                            extractPercent(lineText)
-
-                            // "숫자 kcal, 숫자 g당" 형태 확인
-                            extractNumberKcal(lineText)
-
-                            // "숫자 g)" 형태 확인
-                            extractNumberGBracket(lineText)
-                        }
-
-                    }
-                    // 이미지 처리 후에 결과를 출력
-                    showResults()
-                    koreanCharactersListmodi = koreanCharactersList.distinct().toMutableList()
-                    koreanCharactersListmodi = koreanCharactersListmodi.map { it.replace(Regex("[^가-힣]"), "") }.toMutableList()
-                    runOnUiThread { // OCR 결과 학인 위해.. 나중에 제거할 예정
- //                       textView.append("$koreanCharactersListmodi\n")
-                        //textView.append("$percentList\n")
-                    }
-
                 }
                 .addOnFailureListener { e ->
-
                     e.printStackTrace()
                     showAlertDialog("네트워크를 연결해주세요 또는 API 연동 중이거나 적합하지 않은 이미지일 수 있습니다.")
                 }
         } catch (e: Exception) {
             e.printStackTrace()
-            // 추가로 예외 정보를 로그에 출력
-            Log.e("wrong", "Exception occurred: ${e.message}", e)
+            Log.e("Error", "Exception occurred: ${e.message}", e)
         }
+    }
+
+    ////////// 알레르기 추출 함수 /////////////
+    private fun extractAllergyData(lines: List<String>) {
+        val targetWords = listOf(
+            "메밀", "밀", "대두", "땅콩", "호두", "잣", "계란",
+            "아황산류", "복숭아", "토마토", "난류", "우유", "새우",
+            "고등어", "오징어", "게", "조개류", "돼지고기", "쇠고기", "닭고기"
+        )
+
+        var foundHamuIndex: Int? = null
+
+        for ((index, lineText) in lines.withIndex()) {
+            if (lineText.contains("함유")) {
+                foundHamuIndex = index
+
+                val previousLineIndex = index - 1
+                if (previousLineIndex >= 0) {
+                    val previousLineText = lines[previousLineIndex]
+                    for (targetWord in targetWords) {
+                        if (previousLineText.contains(targetWord)) {
+                            extractedWords.add(targetWord)
+                        }
+                    }
+                }
+            }
+
+            if (foundHamuIndex != null && foundHamuIndex == index) {
+                for (targetWord in targetWords) {
+                    if (lineText.contains(targetWord)) {
+                        extractedWords.add(targetWord)
+                    }
+                }
+            }
+        }
+
+        Log.d("AllergyData", "추출된 알레르기 데이터: $extractedWords")
+    }
+
+    ////////// OCR API 호출 함수 /////////////
+    private fun extractOcrData(result: Text) {
+        for (block in result.textBlocks) {
+            for (line in block.lines) {
+                val lineText = line.text
+
+                // OCR에서 데이터를 추출 : mg, %, kca, g당
+                extractNumberG(lineText)
+                extractPercent(lineText)
+                extractNumberKcal(lineText)
+                // extractNumberGBracket(lineText)
+
+                // 키워드 처리
+                for (element in line.elements) {
+                    val elementText = element.text
+                    for (keyword in keywords) {
+                        if (elementText.contains(keyword)) {
+                            koreanCharactersList.add(elementText)
+                        }
+                    }
+                }
+            }
+        }
+
+        // 중복 제거 및 데이터 정제
+        koreanCharactersListmodi = koreanCharactersList.distinct().toMutableList()
+        koreanCharactersListmodi = koreanCharactersListmodi.map { it.replace(Regex("[^가-힣]"), "") }.toMutableList()
+
+        // OCR 데이터를 기반으로 moPercentList 생성
+        showResults()
+//        moPercentList = modiPercentList(percentList)
+//        if (moPercentList.isEmpty()) {
+//            Log.e("OCRFallback", "OCR 데이터가 유효하지 않습니다.")
+//        } else {
+//            Log.d("OCRFallback", "OCR 데이터 처리 성공: $moPercentList")
+//        }
     }
 
     //"숫자 g" 형태를 추출하는 함수 - g, mg, 9 앞에 숫자를 추출함
@@ -408,7 +563,7 @@ class LoadingActivity : AppCompatActivity() {
     }
 
 
-    // 칼로리 필터링 및 변형 함수, 함수 이름 수정 예정
+    // 칼로리 필터링 및 변형 함수
     private fun showResults() {
 
         // "kcal" 리스트에서 "000kcal" 및 "2000kcal" 제거

@@ -29,6 +29,7 @@
         android:roundIcon="@mipmap/ic_main_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BeYourEyes"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
             android:name=".NutriCautionActivity"
