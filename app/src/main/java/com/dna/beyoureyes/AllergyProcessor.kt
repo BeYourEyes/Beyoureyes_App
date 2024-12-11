@@ -30,6 +30,19 @@ object AllergyProcessor{
         }
     }
 
+    // 이전 라인에서 알레르기 추출
+    private fun extractWordsPrevioueLine(lines: List<String>, index: Int) {
+        val previousLineIndex = index - 1
+        if (previousLineIndex >= 0) {
+            val previousLineText = lines[previousLineIndex]
+            allergyTargetWords.forEach { targetWord ->
+                if (previousLineText.contains(targetWord)) {
+                    extractedWords.add(targetWord)
+                }
+            }
+        }
+    }
+
 
 
 }
