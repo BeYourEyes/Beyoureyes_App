@@ -6,13 +6,14 @@ import android.os.Bundle
 import android.widget.Button
 import com.dna.beyoureyes.databinding.ActivityNutriCautionBinding
 
-class NutriCautionActivity : BaseActivity() {
+class NutriCautionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityNutriCautionBinding
     private lateinit var SecondButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        overridePendingTransition(R.anim.horizon_enter, R.anim.horizon_exit)
         binding = ActivityNutriCautionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -21,7 +22,8 @@ class NutriCautionActivity : BaseActivity() {
         binding.include.toolbarTitle.text = "영양 정보 촬영하기"
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
         }
 
         SecondButton = binding.buttonsecond

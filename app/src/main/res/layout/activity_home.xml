@@ -42,7 +42,7 @@
                 android:layout_marginEnd="6sp"
                 android:contentDescription="@null"
                 android:scaleType="fitXY"
-        
+                android:onClick="onImageView1Click1"
                 app:srcCompat="@drawable/homebutton1" />
 
             <ImageView
@@ -53,7 +53,7 @@
                 android:layout_marginStart="6sp"
                 android:contentDescription="@null"
                 android:scaleType="fitXY"
-         
+                android:onClick="onImageView1Click2"
                 app:srcCompat="@drawable/homebutton2" />
         </LinearLayout>
 
@@ -72,7 +72,7 @@
                 android:layout_marginEnd="6sp"
                 android:contentDescription="@null"
                 android:scaleType="fitXY"
-      
+                android:onClick="onImageView1Click3"
                 app:srcCompat="@drawable/homebutton3" />
 
             <ImageView
@@ -83,7 +83,7 @@
                 android:layout_marginStart="6sp"
                 android:contentDescription="@null"
                 android:scaleType="fitXY"
-          
+                android:onClick="onImageView1Click4"
                 app:srcCompat="@drawable/homebutton4" />
         </LinearLayout>
 

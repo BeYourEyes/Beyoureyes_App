@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.dna.beyoureyes.databinding.ActivityCameraFirstBinding
 import org.opencv.android.OpenCVLoader
 
-class CameraFirstActivity : BaseActivity()  {
+class CameraFirstActivity : AppCompatActivity()  {
 
     private lateinit var binding: ActivityCameraFirstBinding
     private val camera = Camera()
@@ -16,6 +16,7 @@ class CameraFirstActivity : BaseActivity()  {
         super.onCreate(savedInstanceState)
         binding = ActivityCameraFirstBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        overridePendingTransition(R.anim.horizon_enter, R.anim.horizon_exit)
 
         // 툴바
         setSupportActionBar(binding.include.toolbarDefault)
@@ -23,7 +24,8 @@ class CameraFirstActivity : BaseActivity()  {
         binding.include.toolbarTitle.text = "영양 정보 촬영하기"
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
         }
 
 

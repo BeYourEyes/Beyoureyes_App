@@ -33,7 +33,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class FoodInfoNutritionActivity : BaseActivity() {
+class FoodInfoNutritionActivity : AppCompatActivity() {
 
     private lateinit var ttsManager: TTSManager
     private lateinit var speakButton: Button
@@ -44,7 +44,6 @@ class FoodInfoNutritionActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityFoodInfoNutritionBinding.inflate(layoutInflater) // Inflate the binding
         setContentView(binding.root)
 
@@ -54,7 +53,9 @@ class FoodInfoNutritionActivity : BaseActivity() {
         binding.include.toolbarTitle.text = "영양 분석 결과"
 
         binding.include.toolbarBackBtn.setOnClickListener {
-            goToHome() // BaseActivity에서 정의한 홈화면 이동 함수(화면전환효과적용)
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.horizon_exit, R.anim.horizon_enter)
         }
 
         // 버튼 초기화
@@ -312,11 +313,14 @@ class FoodInfoNutritionActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
         if (ttsManager.isSpeaking()) {
             ttsManager.stop()
             speakButton.text = "설명 듣기 / ▶"
         }
+        val intent = Intent(this, HomeActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
+        finish()
     }
 
     private fun applyBarChart(barChart: BarChart, entries: List<BarEntry>, color: String, maximum: Float) {

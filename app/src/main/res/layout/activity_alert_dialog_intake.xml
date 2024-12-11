@@ -20,11 +20,12 @@
         style="@style/title2"/>
 
 
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="470dp"
-        android:orientation="horizontal"
-        android:padding="24dp">
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        android:orientation="horizontal">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -34,44 +35,41 @@
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/horizontalChartIntake"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="474dp"
                 android:layout_weight="1" />
 
             <View
                 android:id="@+id/view1"
                 android:layout_width="wrap_content"
-                android:layout_height="100dp"
-                android:layout_marginStart="15dp"
+                android:layout_height="112dp"
                 android:layout_marginTop="15dp"
+                android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
-                android:background="@drawable/graph_view" />
-
+                android:background="@drawable/graph_view"/>
             <View
                 android:id="@+id/view2"
                 android:layout_width="wrap_content"
-                android:layout_height="100dp"
+                android:layout_height="112dp"
+                android:layout_marginTop="126dp"
                 android:layout_marginStart="15dp"
-                android:layout_marginTop="115dp"
                 android:layout_marginEnd="15dp"
-                android:background="@drawable/graph_view" />
-
+                android:background="@drawable/graph_view"/>
             <View
                 android:id="@+id/view3"
                 android:layout_width="wrap_content"
-                android:layout_height="100dp"
+                android:layout_height="112dp"
+                android:layout_marginTop="237dp"
                 android:layout_marginStart="15dp"
-                android:layout_marginTop="215dp"
                 android:layout_marginEnd="15dp"
-                android:background="@drawable/graph_view" />
-
+                android:background="@drawable/graph_view"/>
             <View
                 android:id="@+id/view4"
                 android:layout_width="wrap_content"
-                android:layout_height="100dp"
+                android:layout_height="112dp"
+                android:layout_marginTop="348dp"
                 android:layout_marginStart="15dp"
-                android:layout_marginTop="315dp"
                 android:layout_marginEnd="15dp"
-                android:background="@drawable/graph_view" />
+                android:background="@drawable/graph_view"/>
 
         </FrameLayout>
 

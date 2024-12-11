@@ -13,12 +13,12 @@ import com.dna.beyoureyes.databinding.ActivityUserInfoRegisterBinding
 import java.io.Serializable
 
 
-//val diseaseList : List<String> = listOf("고혈압", "고지혈증", "당뇨")
-//val allergyList : List<String> = listOf("메밀", "밀", "콩", "호두", "땅콩", "복숭아", "토마토", "돼지고기", "난류", "우유", "닭고기", "쇠고기", "새우", "고등어", "홍합", "전복", "굴", "조개류", "게", "오징어", "아황산")
+val diseaseList : List<String> = listOf("고혈압", "고지혈증", "당뇨")
+val allergyList : List<String> = listOf("메밀", "밀", "콩", "호두", "땅콩", "복숭아", "토마토", "돼지고기", "난류", "우유", "닭고기", "쇠고기", "새우", "고등어", "홍합", "전복", "굴", "조개류", "게", "오징어", "아황산")
 
-class UserInfoRegisterActivity : BaseActivity() {
-    //private var clickedDisease : MutableList<Boolean> = mutableListOf(false, false, false)
-    //private var clickedAllergic : MutableList<Boolean> = MutableList(21) { false }
+class UserInfoRegisterActivity : AppCompatActivity() {
+    private var clickedDisease : MutableList<Boolean> = mutableListOf(false, false, false)
+    private var clickedAllergic : MutableList<Boolean> = MutableList(21) { false }
     private val userDiseaseList : ArrayList<String> = arrayListOf()
     private val userAllergyList : ArrayList<String> = arrayListOf()
     var userSex : Int = 0;
@@ -31,6 +31,10 @@ class UserInfoRegisterActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityUserInfoRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        overridePendingTransition(R.anim.horizon_enter, R.anim.horizon_exit)
+
+        //val userInfoRegisterTitle = findViewById<TextView>(R.id.userInfoRegisterTitle)
+
 
         val age : EditText = binding.editAge
 
@@ -101,19 +105,17 @@ class UserInfoRegisterActivity : BaseActivity() {
             sexSwitch.isChecked = (it.gender==Gender.WOMAN.ordinal)
 
             // 사용자 질환
-            if (it.hasDisease()){
+            it.disease?.let { userDisease ->
                 for (chip in diseaseChips) {
-                    if (it.disease.contains(chip.text)){
+                    if (userDisease.contains(chip.text)){
                         chip.isChecked = true
                     }
                 }
             }
-
             // 사용자 알레르기
-
-            if (it.hasAllergy()){
+            it.allergic?.let { userAllergic ->
                 for (chip in allergyChips) {
-                    if (it.allergic.contains(chip.text)){
+                    if (userAllergic.contains(chip.text)){
                         chip.isChecked = true
                     }
                 }
@@ -168,10 +170,13 @@ class UserInfoRegisterActivity : BaseActivity() {
                             AppUser.info?.gender = userSex
 
                             // 질환 정보
-                            AppUser.info?.disease = userDiseaseList.toMutableSet()
+                            AppUser.info?.disease?.clear()
+                            AppUser.info?.disease?.addAll(checkedDisease)
 
                             // 알레르기 정보
-                            AppUser.info?.allergic = userAllergyList.toMutableSet()
+                            AppUser.info?.allergic?.clear()
+                            AppUser.info?.allergic?.addAll(checkedAllergy)
+
 
                             Log.d("REGISTERFIRESTORE : ", "DELETE START")
                             deleteData(AppUser.id!!, "userInfo") {
@@ -179,8 +184,8 @@ class UserInfoRegisterActivity : BaseActivity() {
                                 // 여기에서 sendData 함수 호출
                                 val userInfo = hashMapOf(
                                     "userID" to AppUser.id!!,
-                                    "userAge" to ageInt,
-                                    "userSex" to userSex,
+                                    "userAge" to AppUser.info!!.age,
+                                    "userSex" to AppUser.info!!.gender,
                                     "userDisease" to userDiseaseList,
                                     "userAllergic" to userAllergyList
                                 )
@@ -190,14 +195,14 @@ class UserInfoRegisterActivity : BaseActivity() {
                                 Log.d("FIRESTORE : ", "DELETE1")
 
                                 val intent = Intent(this, UserInfoActivity::class.java)
-                                goToBack(intent)
+                                startActivity(intent)
                             }
                         }
                         else {
 
                             AppUser.info = UserInfo(
                                 ageInt, userSex,
-                                userDiseaseList.toMutableSet(), userAllergyList.toMutableSet())
+                                checkedDisease.toMutableSet(), checkedAllergy.toMutableSet())
 
                             // 유저 정보가 없는 경우에는 바로 sendData 함수 호출
                             val userInfo = hashMapOf(
@@ -211,10 +216,8 @@ class UserInfoRegisterActivity : BaseActivity() {
                             userDiseaseList.clear()
                             userAllergyList.clear()
                             Log.d("REGISTERFIRESTORE : ", "DELETE2")
-
                             val intent = Intent(this, UserInfoActivity::class.java)
-                            goToBack(intent)
-
+                            startActivity(intent)
                         }
 
                     }
@@ -226,10 +229,7 @@ class UserInfoRegisterActivity : BaseActivity() {
         usrInfoRegiCancelButton.setOnClickListener {
             onBackPressed()
         }
-    }
 
-    override fun onBackPressed() {
-        goToBack()
     }
 
     private fun sendData(userInfo : HashMap<String, Serializable>, collectionName : String){
