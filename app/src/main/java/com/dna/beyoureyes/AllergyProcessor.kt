@@ -20,4 +20,16 @@ object AllergyProcessor{
     }
 
 
+    // 첫번째 라인에서 알레르기 추출
+    private fun extractWordsFirstLine(lines: List<String>, index : Int) {
+        val lineText = lines[index]
+        allergyTargetWords.forEach{ targetWord ->
+            if (lineText.contains(targetWord)) {
+                extractedWords.add(targetWord)
+            }
+        }
+    }
+
+
+
 }
