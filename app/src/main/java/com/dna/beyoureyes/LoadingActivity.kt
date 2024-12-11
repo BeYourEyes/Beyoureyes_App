@@ -85,11 +85,12 @@ class LoadingActivity : AppCompatActivity() {
             val hasValidKeywordOrder = checkKeywordOrder(koreanCharactersListmodi)
             val isValidPercentData = isValidData_per()
 
+
             when {
-                hasValidKeywordOrder && isValidData &&  isValidPercentData && isValidAllergyData  -> {
+                isValidData &&  isValidPercentData && isValidAllergyData  -> {
                     startFoodInfoAllActivity()
                 }
-                hasValidKeywordOrder && isValidData && isValidPercentData -> {
+                isValidData && isValidPercentData -> {
                     startFoodInfoNutritionActivity()
                 }
                 isValidAllergyData -> {
@@ -328,8 +329,8 @@ class LoadingActivity : AppCompatActivity() {
     }
 
     private fun isValidData(): Boolean { // 퍼센트와 칼로리 유효성 판단
-
-        return percentList.size == 7 && kcalList.size == 1 && percentList.all { it.isNotEmpty() } && kcalList.all { it.isNotEmpty() } && koreanCharactersListmodi.all { it.isNotEmpty() } && moPercentList.size == 7
+        return kcalList.size == 1 && kcalList.all { it.isNotEmpty() }  && moPercentList.size == 7
+        // return percentList.size == 7 && kcalList.size == 1 && percentList.all { it.isNotEmpty() } && kcalList.all { it.isNotEmpty() } && koreanCharactersListmodi.all { it.isNotEmpty() } && moPercentList.size == 7
     }
 
     private fun isValidData_alergy(): Boolean { // 알레르기 유효성 판단
