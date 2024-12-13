@@ -186,6 +186,7 @@ class FatDRI() : DailyValue, DRIwithClosedRange {
     // 권장 섭취량 = 에너지 섭취 제한 비율(최소값)
     private fun setRecommendedDietaryAllowance(energyReq:Int, disease: Array<String>?) {
         if( disease != null && disease.contains("고지혈증"))
+        if( disease != null && disease.contains("고지혈증"))
             recommendedAllowance = ((energyReq * 0.15) / 9).toInt() * 1000
         else
             recommendedAllowance = ((energyReq * 0.15) / 9).toInt() * 1000
