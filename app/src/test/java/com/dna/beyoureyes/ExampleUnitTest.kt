@@ -26,6 +26,8 @@ class ExampleUnitTest {
         nutriDailyValue.personalizeAllProperties(0, 60, arrayOf(""))
 
     }
+
+    //setPersonalizedEnergy(gender, age) -> 26가지
     @Test
     fun Energy_isCorrect() {
         // Gender.WOMAN.ordinal = 0, Gender.MAN.ordinal = 1
@@ -39,7 +41,7 @@ class ExampleUnitTest {
             }
         }
     }
-    //natrium.personalize(age, disease)
+    //natrium.personalize(age, disease) -> 8가지
     @Test
     fun Natrium_isCorrect() {
         // daily Value의 경우
@@ -55,13 +57,35 @@ class ExampleUnitTest {
     }
 
     // 각 영양소에 대한 분류 기준, 순서대로 사용자 personalize 예정
-    //carbs.personalize()
-    //sugar.personalize(this.energy)
-    //protein.personalize(gender, age)
-    //fat.personalize(this.energy, disease)
-    //satFat.personalize(age, this.energy, disease)
-    //chol.personalize(disease)
-    //setPersonalizedEnergy(gender, age)
+    //carbs.personalize() -> 1가지
+    @Test
+    fun Carbs_isCorrect() {
+        assertEquals(130000, nutriDailyValue.carbs.dailyValue)
+    }
+
+    //sugar.personalize(this.energy) -> 3가지(경계값 분석으로 -1, 0, Int.MAX_VALUE)
+    @Test
+    fun Sugar_isCorrect() {
+        val energyArray = arrayOf(-1, 0, Int.MAX_VALUE)
+        energyArray.forEach { energy ->
+            val intakeCategory = nutriDailyValue.sugar.intakeRange!!.entries.find {
+                energy in it.value
+            }?.key
+            // 결과를 출력하거나 assert로 테스트 가능
+            when (intakeCategory) {
+                IntakeRange.LESS -> println("$energy: LESS (주의)")
+                IntakeRange.ENOUGH -> println("$energy: ENOUGH (적정)")
+                IntakeRange.OVER -> println("$energy: OVER (경고)")
+                else -> println("$energy: 범위 밖")
+            }
+
+        }
+
+    }
+    //protein.personalize(gender, age) -> 6가지
+    //fat.personalize(this.energy, disease) -> 4가지
+    //satFat.personalize(age, this.energy, disease) -> 6가지
+    //chol.personalize(disease) -> 6가지sk
     @Test
     fun Protein_isCorrect() {
 
