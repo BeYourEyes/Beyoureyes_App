@@ -44,6 +44,8 @@
 ## 🧀 ERD
 ![ERD](https://github.com/user-attachments/assets/883b8742-dbdc-4715-8be1-c66b60d0f661)
 
+## 🎨 UI/UX Figma
+[UI/UX 피그마 링크](https://www.figma.com/design/qLpKu5KxPhngqKwVxJr9bW/%ED%99%94%EB%A9%B4%EC%84%A4%EA%B3%84-(Copy)?node-id=0-1&p=f)
 ## 🥞 Stacks
 
 ### Env
