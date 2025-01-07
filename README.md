@@ -66,14 +66,17 @@
     <td align="center">
       <strong>문지영</strong><br>
 <a href="https://github.com/moon0900">@moon0900</a>
+     <p>Android</p>
     </td>
     <td align="center">
       <strong>이수진</strong><br>
 <a href="https://github.com/Soojin-Lee-01">@Soojin-Lee-01</a>
+     <p>Android</p>
     </td>
     <td align="center">
       <strong>이소영</strong><br>
 <a href="https://github.com/jordan-comlinee">@jordan-comlinee</a>
+     <p>Android</p>
     </td>
   </tr>
 </table>
