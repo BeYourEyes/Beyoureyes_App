@@ -65,17 +65,14 @@
   <tr>
     <td align="center">
       <strong>문지영</strong><br>
-      <img src="" width="160"/><br>
 <a href="https://github.com/moon0900">@moon0900</a>
     </td>
     <td align="center">
       <strong>이수진</strong><br>
-      <img src="https://github.com/user-attachments/assets/4da94270-5034-4152-a626-753d9f7b90a1" height="200"/><br>
 <a href="https://github.com/Soojin-Lee-01">@Soojin-Lee-01</a>
     </td>
     <td align="center">
       <strong>이소영</strong><br>
-      <img src="https://github.com/user-attachments/assets/6118a3f0-1934-4796-8c85-144c261d4ec5" height="200"/><br>
 <a href="https://github.com/jordan-comlinee">@jordan-comlinee</a>
     </td>
   </tr>
